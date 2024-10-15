@@ -1,14 +1,49 @@
-import { Image, StyleSheet, Platform, Text, TextInput, View, Button} from 'react-native';
-
+import { Image, StyleSheet, View, Button, Text } from 'react-native';
+import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import React, { useState, useEffect } from 'react';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
-import React, { useState } from 'react';
-
+import { Link, router } from 'expo-router';
 
 export default function App() {
+  // const [error, setError] = useState<string | null>(null);
+  // const [userInfo, setUserInfo] = useState<any | null>(null);
+
+  // useEffect(() => {
+  //   // Configure Google Sign-In
+  //   GoogleSignin.configure({
+  //     webClientId: "425738190008-p395osri5l34h9geop7egg4eld1j2njh.apps.googleusercontent.com",
+  //     // Add other options if needed
+  //   });
+  // }, []);
+
+  // const signin = async () => {
+  //   try {
+  //     await GoogleSignin.hasPlayServices(); // Check if Google Play Services are available
+  //     const user = await GoogleSignin.signIn(); // Sign in the user
+  //     setUserInfo(user); // Store user info in state
+  //     setError(null); // Reset error
+  //   } catch (e) {
+  //     if (e instanceof Error) {
+  //       setError(e.message || 'An error occurred'); // Set error message
+  //     } else {
+  //       setError('An unknown error occurred');
+  //     }
+  //   }
+  // };
+
+  // const logout = async () => {
+  //   try {
+  //     await GoogleSignin.revokeAccess(); // Revoke access if necessary
+  //     await GoogleSignin.signOut(); // Sign out the user
+  //     setUserInfo(null); // Reset user info
+  //     setError(null); // Reset error
+  //   } catch (e) {
+  //     setError(e.message || 'An error occurred during logout'); // Handle logout errors
+  //   }
+  // };
 
   return (
     <ParallaxScrollView
@@ -21,10 +56,18 @@ export default function App() {
       }>
       <View style={styles.titleContainer}>
         <ThemedText type="title">Welcome! to TastyTrade</ThemedText>
-        <HelloWave />
       </View>
       <View style={styles.titleContainer}>
-        <Link href="/(auth)/login" style={styles.loginContainer}>Login or Sign Up</Link>
+        {/* {error && <Text style={styles.errorText}>{error}</Text>} */}
+        <Button title="Start" onPress={() => router.push('../(auth)/login')} />
+        {/* {userInfo ? (
+          <>
+            <Text>{JSON.stringify(userInfo)}</Text>
+            <Button title="Logout" onPress={logout} />
+          </>
+        ) : (
+          <GoogleSigninButton size={GoogleSigninButton.Size.Standard} onPress={signin} />
+        )} */}
       </View>
     </ParallaxScrollView>
   );
@@ -32,27 +75,18 @@ export default function App() {
 
 const styles = StyleSheet.create({
   titleContainer: {
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: 'rgba(255, 255, 255, 0.5)',
     gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
   },
   reactLogo: {
-    height: 300,
-    width: 300,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    height: 200,
+    width: 200,
+    alignSelf: 'center',
   },
-  loginContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    color: 'white',
-    textDecorationLine: 'underline',
-  }
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });

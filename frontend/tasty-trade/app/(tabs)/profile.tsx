@@ -13,9 +13,9 @@ export default function HomeScreen() {
           headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
           headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
           <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Chat</ThemedText>
+            <ThemedText type="title">Profile</ThemedText>
           </ThemedView>
-          <ThemedText>Show Messages Below</ThemedText>
+          <ThemedText>Show the Profile of the User Here</ThemedText>
         </ParallaxScrollView>
       );
 }

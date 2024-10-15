@@ -1,101 +1,168 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import React, { useState } from 'react';
+import { Tabs, router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+// import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeScreen() {
+export default function NewPost() {
+    const [image, setImage] = useState<string | null>(null);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+  
+    const pickImage = async () => {
+      // Ask for permission to access media library
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permission required', 'Permission to access the camera roll is required!');
+        return;
+      }
+  
+      // Open image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        setImage(result.assets[0].uri); // Set the selected image URI
+      }
+    };
+  
+    const handleShare = () => {
+      if (!image || !title || !description) {
+        Alert.alert('Error', 'Please complete all fields.');
+        return;
+      }
+      // Logic for sharing the post (e.g., upload to backend)
+      Alert.alert('Success', 'Post shared successfully!');
+      router.push('../(tabs)/home')
+    };
+
+    const handleCancel = () => {
+        Alert.alert('Canceled Post Creation', 'Post has been canceled, returned to homepage');
+        router.push('../(tabs)/home')
+      };
+
+    const handleImageCancel = () => {
+        if (image) {
+            setImage(null);
+        }
+    };
+  
+  
     return (
-        <ParallaxScrollView
-          headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-          headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-          <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Create Post</ThemedText>
-          </ThemedView>
-          <ThemedText>Create a post a fill out information below</ThemedText>
-          {/* <Collapsible title="File-based routing">
-            <ThemedText>
-              This app has two screens:{' '}
-              <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-              <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText>
-              The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-              sets up the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="link">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedText>
-              You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-              <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-            </ThemedText>
-          </Collapsible>
-          <Collapsible title="Images">
-            <ThemedText>
-              For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-              <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-              different screen densities
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="link">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-          <Collapsible title="Custom fonts">
-            <ThemedText>
-              Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-              <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-                custom fonts such as this one.
-              </ThemedText>
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-              <ThemedText type="link">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-          <Collapsible title="Light and dark mode components">
-            <ThemedText>
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-              what the user's current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="link">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-          <Collapsible title="Animations">
-            <ThemedText>
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-              the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-              to create a waving hand animation.
-            </ThemedText> */}
-            {/* {Platform.select({
-              ios: (
-                <ThemedText>
-                  The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-                  component provides a parallax effect for the header image.
-                </ThemedText>
-              ),
-            })}
-          </Collapsible> */}
-        </ParallaxScrollView>
-      );
-}
-const styles = StyleSheet.create({
-    headerImage: {
-      color: '#808080',
-      bottom: -90,
-      left: -35,
-      position: 'absolute',
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Tasty Trade</Text>
+        </View>
+  
+        <TouchableOpacity onPress={handleImageCancel}>
+          <Text style={styles.cancel}>Cancel Image</Text>
+        </TouchableOpacity>
+  
+        <Text style={styles.subTitle}>New Post</Text>
+  
+        {image ? (
+          <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Text>No image selected</Text>
+          </View>
+        )}
+  
+        <TouchableOpacity onPress={pickImage} style={styles.imageButton}>
+          <Text style={styles.imageButtonText}>Select Image</Text>
+          <Ionicons name="create-outline" size={20} color="black" />
+        </TouchableOpacity>
+  
+        <TextInput
+          style={styles.input}
+          placeholder="Write a title..."
+          value={title}
+          onChangeText={setTitle}
+        />
+  
+        <TextInput
+          style={styles.input}
+          placeholder="Write a description..."
+          value={description}
+          onChangeText={setDescription}
+        />
+  
+        <Button title="Share" onPress={handleShare}/>
+        <Button title="Cancel" onPress={handleCancel}/>
+      </View>
+    );
+  }
+  
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#fff',
+      justifyContent: 'center',
     },
-    titleContainer: {
+    header: {
       flexDirection: 'row',
-      gap: 8,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+    },
+    cancel: {
+      color: 'black',
+      marginBottom: 10,
+    },
+    subTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 20,
+    },
+    image: {
+      width: 200,
+      height: 200,
+      borderRadius: 100,
+      alignSelf: 'center',
+      marginBottom: 20,
+    },
+    imagePlaceholder: {
+      width: 200,
+      height: 200,
+      borderRadius: 100,
+      backgroundColor: '#eee',
+      justifyContent: 'center',
+      alignItems: 'center',
+      alignSelf: 'center',
+      marginBottom: 20,
+    },
+    imageButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+    },
+    imageButtonText: {
+      marginRight: 5,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      padding: 10,
+      marginBottom: 10,
+      borderRadius: 5,
     },
   });

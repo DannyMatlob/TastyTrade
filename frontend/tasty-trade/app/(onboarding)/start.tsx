@@ -6,29 +6,35 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 
-export default function Login() {
+export default function Onboarding() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
 
-  // Function to handle login submission
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password.');
-      return;
+  const handleSignUp = () => {
+    if (!name || !address) {
+      Alert.alert('Error', 'Please enter both a name and address.');
+    } 
+    else {
+      Alert.alert('Success', 'Sign Up successfully!');
+      router.push('../(tabs)/home');
     }
 
-    if (email === '123@gmail.com' && password === '123') {
-      Alert.alert('Success', 'Logged in successfully!');
-      router.push('../(tabs)/home')
-    } else {
-      Alert.alert('Error', 'Invalid email or password.');
-    }
+    // Example login logic (replace with real authentication logic)
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Provide Information</Text>
       
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+        autoCapitalize='words'
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -37,7 +43,6 @@ export default function Login() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -46,8 +51,14 @@ export default function Login() {
         secureTextEntry
         autoCapitalize="none"
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Sign Up" onPress={() => router.push('../(onboarding)/start')} />
+      <TextInput
+        style={styles.input}
+        placeholder="Address"
+        value={address}
+        onChangeText={setAddress}
+        autoCapitalize='words'
+      />
+      <Button title="Sign Up" onPress={handleSignUp} />
     </View>
   );
 }
