@@ -3,7 +3,13 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "_comment": "Prefer usage of start-web and start-android for ease.",
     "start": "expo start",
+
+    "__comment": "start-web and start-android run expo in 'GO' mode which is required for app to run.",
+    "start-web": "expo start --go --web",
+    "start-android": "expo start --go --android",
+
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
