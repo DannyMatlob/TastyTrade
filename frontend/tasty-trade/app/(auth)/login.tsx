@@ -17,7 +17,7 @@ export default function Login() {
       return;
     }
 
-    if (email === '123@gmail.com' && password === '123') {
+    if (email === '123' && password === '123') {
       Alert.alert('Success', 'Logged in successfully!');
       router.push('../(tabs)/home')
     } else {

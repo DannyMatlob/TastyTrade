@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import React, { useState } from 'react';
-
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -21,16 +22,16 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color}  size={focused ? 30 : 25}/>
           ),
         }}
       />
       <Tabs.Screen
-        name="createPost"
+        name="post"
         options={{
           title: 'Post',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <MaterialCommunityIcons name={focused ? 'food-outline' : 'food-outline'} color={color} size={focused ? 30 : 25}/>
           ),
         }}
       />
@@ -39,19 +40,11 @@ export default function TabLayout() {
         options={{
           title: 'Chat',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <Ionicons name={focused ? 'chatbox-ellipses-outline' : 'chatbox-ellipses-outline'} color={color} size={focused ? 30 : 25}/>
           ),
         }}
       />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
+
     </Tabs>
   );
 }
