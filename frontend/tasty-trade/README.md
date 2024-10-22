@@ -3,7 +3,13 @@
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started
+0. Update expo to latest version. Clean dependencies
 
+   ```bash
+   npm install expo@latest
+
+   npx expo install --fix
+   ```
 1. Install dependencies
 
    ```bash

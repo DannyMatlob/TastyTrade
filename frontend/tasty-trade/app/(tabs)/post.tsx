@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, Platform, View, Text, TextInput, Button, Alert, TouchableOpacity, FlatList} from 'react-native';
-
+import Feather from '@expo/vector-icons/Feather';
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -33,44 +33,40 @@ const DATA = [
       description: "blahblahblah",
     },
     {
-      id: '4',
-      title: '1 Sack of Potatoes',
-      distance: '5 miles away',
-      image: 'https://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP-1200-80.jpg',
-      description: "blahblahblah",
-    },
-    {
-      id: '5',
-      title: 'Leftover Grilled Fish',
-      distance: '8 miles away',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLzY8x_-ePWVNjBXIFNAhvc-Cb1MbkWzWZ6A&s',
-      description: "blahblahblah",
-    },
-    {
-      id: '6',
-      title: '10 cups of Yogurt',
-      distance: '12 miles away',
-      image: 'https://www.yoplait.com/_next/image?url=https%3A%2F%2Fprodcontent.yoplait.com%2Fwp-content%2Fuploads%2F2020%2F12%2Fyoplait-original-vanilla-tub-460x460-1.png&w=1400&q=75',
-      description: "blahblahblah",
-    },
+        id: '4',
+        title: '1 Sack of Potatoes',
+        distance: '5 miles away',
+        image: 'https://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP-1200-80.jpg',
+        description: "blahblahblah",
+      },
+      {
+        id: '5',
+        title: 'Leftover Grilled Fish',
+        distance: '8 miles away',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLzY8x_-ePWVNjBXIFNAhvc-Cb1MbkWzWZ6A&s',
+        description: "blahblahblah",
+      },
+      {
+        id: '6',
+        title: '10 cups of Yogurt',
+        distance: '12 miles away',
+        image: 'https://www.yoplait.com/_next/image?url=https%3A%2F%2Fprodcontent.yoplait.com%2Fwp-content%2Fuploads%2F2020%2F12%2Fyoplait-original-vanilla-tub-460x460-1.png&w=1400&q=75',
+        description: "blahblahblah",
+      },
   ];
 
   const handleDetails = (arg) => {
-    Alert.alert('Food Description', arg, [
-        { text: "Cancel", onPress: () => console.log("Cancel Pressed"), style: "cancel" },
-        { text: "Request", onPress: () => console.log("OK Pressed") }
-      ],
-      { cancelable: false });
+    router.push('../(posts)/editPost', arg)
   }
 
-  const Item = ({ title, distance, image, description }) => (
+  const Item = ({id,  title, distance, image, description }) => (
     <View style={styles.item}>
         <Image source={{ uri: image }} style={styles.image} />
         <View style={styles.info}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.distance}>{distance}</Text>
-            <TouchableOpacity style={styles.button} onPress={() => handleDetails(description)}>
-                <Text style={styles.buttonText}>Details</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleDetails(id)}>
+                <Text style={styles.buttonText}>Edit Details</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -99,6 +95,11 @@ export default function MyPost() {
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
             />
+            <View>
+                <TouchableOpacity onPress={() => router.push('../(posts)/createPost')} style={styles.createButton}>
+                    <Feather name="plus-circle" size={30} color="black" />
+                </TouchableOpacity>
+            </View>
         </View>
       );
     };
@@ -151,10 +152,10 @@ export default function MyPost() {
             marginBottom: 10,
         },
         button: {
-            backgroundColor: '#4CAF50', // Customize background color
-            paddingVertical: 10, // Control height of the button
-            paddingHorizontal: 20, // Control width of the button
-            borderRadius: 5, // Round the corners
+            backgroundColor: '#4CAF50', 
+            paddingVertical: 10,
+            paddingHorizontal: 20, 
+            borderRadius: 5,
             alignItems: 'center',
           },
         buttonText: {
@@ -162,4 +163,10 @@ export default function MyPost() {
             fontSize: 18, // Customize font size
             fontWeight: 'bold',
           },
+        createButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 15,
+        },
       });

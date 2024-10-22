@@ -63,6 +63,9 @@ export default function NewPost() {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Tasty Trade</Text>
+          <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
+            <Ionicons name="person-circle-outline" size={40} color="black" />
+          </TouchableOpacity>
         </View>
   
         <TouchableOpacity onPress={handleImageCancel}>
@@ -98,8 +101,8 @@ export default function NewPost() {
           onChangeText={setDescription}
         />
   
-        <Button title="Share" onPress={handleShare}/>
-        <Button title="Cancel" onPress={handleCancel}/>
+        <Button title="Share" color='#4CAF50' onPress={handleShare}/>
+        <Button title="Cancel" color='#4CAF50' onPress={handleCancel}/>
       </View>
     );
   }
