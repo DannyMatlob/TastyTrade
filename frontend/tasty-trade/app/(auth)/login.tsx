@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 
-import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Alert , Pressable } from 'react-native';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -24,7 +24,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Welcome Page</Text>
       
       <TextInput
         style={styles.input}
@@ -43,31 +43,59 @@ export default function Login() {
         secureTextEntry
         autoCapitalize="none"
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Sign Up" onPress={() => router.push('../(onboarding)/start')} />
+
+      {/* Login Button */}
+      <Pressable style={[styles.primaryButtons, { backgroundColor: '#90D5FF', marginTop: 30, }]} onPress={handleLogin}>
+        <Text style={styles.primaryTexts}>Login</Text>
+      </Pressable>
+
+      {/* Sign Up Button */}
+      <Pressable style={[styles.primaryButtons, { backgroundColor: '#88E788', }]} onPress={() => router.push('../(onboarding)/start')}>
+        <Text style={styles.primaryTexts}>Sign Up</Text>
+      </Pressable>
+
+      {/* Sign Up Button */}
+      <Pressable style={[styles.primaryButtons]}>
+        <Text style={styles.primaryTexts}>Google Auth</Text>
+      </Pressable>
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: 'center', // Center items vertically.
+    alignItems: 'center', // Center items horizontally.
     backgroundColor: '#f5f5f5', // Optional: Adds background color
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 50,
     textAlign: 'center',
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    width: '70%',
+    height: '5%',
+    borderColor: '#6D6D6D',
+    borderWidth: 1.25,
     borderRadius: 5,
-    marginBottom: 15,
+    margin: 15,
     paddingHorizontal: 10,
     backgroundColor: '#fff', // Optional: Adds background color to input
   },
+  primaryButtons: {
+    borderRadius: 10,
+    margin: 10,
+    marginTop: 10,
+    width: '50%',
+    height: '7%',
+    alignItems: 'center', // Centers text horizontally.
+    justifyContent: 'center', // Centers text vertically.
+    borderWidth: 1.5,
+  },
+  primaryTexts: {
+    fontSize: 26,
+    fontWeight: 'bold',
+  }
 });
