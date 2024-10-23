@@ -1,9 +1,6 @@
-import { Tabs, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 
 export default function Login() {
