@@ -1,5 +1,7 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { signInWithPopup, GoogleAuthProvider } from "@firebase/auth";
+import { auth } from './google_auth';
 
 import { StyleSheet, Text, TextInput, View, Alert , Pressable } from 'react-native';
 
@@ -21,6 +23,26 @@ export default function Login() {
       Alert.alert('Error', 'Invalid email or password.');
     }
   };
+
+  const handleGoogleAuth = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+        .then(result => {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential?.accessToken;
+          const user = result.user;
+
+          // TODO: Need logic to register new user or confirm existing user.
+          // Additional documentation: https://firebase.google.com/docs/auth/web/google-signin
+          console.log(user.email);
+          console.log(user.uid);
+
+          router.push('../(tabs)/home')
+        }).catch((error) => {
+          let errorMessage = error.code + " | " + error.message + " from " + error.customData.email + ".";
+          console.log(errorMessage);
+    });
+  }
 
   return (
     <View style={styles.container}>
@@ -55,7 +77,7 @@ export default function Login() {
       </Pressable>
 
       {/* Sign Up Button */}
-      <Pressable style={[styles.primaryButtons]}>
+      <Pressable style={[styles.primaryButtons]} onPress={handleGoogleAuth}>
         <Text style={styles.primaryTexts}>Google Auth</Text>
       </Pressable>
     </View>
