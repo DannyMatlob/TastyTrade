@@ -21,7 +21,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tasty.tastytrade"
+      "package": "com.tasty.tastytrade",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,7 +35,8 @@
     "plugins": [
       "expo-router",
       "@react-native-google-signin/google-signin",
-      ["expo-location", 
+      [
+        "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow TastyTrade to use your location."
         }
@@ -42,9 +47,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "f9a746b3-555d-46d8-ad40-249d8f9972c7"
+        "projectId": "98e07e93-98db-48c3-9c79-3fdc5a58b36f"
       }
     },
-    "owner": "jawblado"
+    "owner": "tastytrade"
   }
 }
