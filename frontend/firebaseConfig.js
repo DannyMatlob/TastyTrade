@@ -14,5 +14,3 @@ const firebaseConfig = {
 console.log(process.env.EXPO_PUBLIC_API_KEY);
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app)
-
-//android: 425738190008-3tkn9h0o2v0citdfqtrnusgd1t3krqoh.apps.googleusercontent.come
