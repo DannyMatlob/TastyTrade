@@ -7,43 +7,50 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link, router } from 'expo-router';
 
+//Auth
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+} from "firebase/auth"
+import { auth } from "../firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 export default function App() {
-  // const [error, setError] = useState<string | null>(null);
-  // const [userInfo, setUserInfo] = useState<any | null>(null);
 
-  // useEffect(() => {
-  //   // Configure Google Sign-In
-  //   GoogleSignin.configure({
-  //     webClientId: "425738190008-p395osri5l34h9geop7egg4eld1j2njh.apps.googleusercontent.com",
-  //     // Add other options if needed
-  //   });
-  // }, []);
+  const [userInfo, setUserInfo] = React.useState();
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId:process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    webClientId:process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    redirectUri:"com.tasty.tastytrade:/(onboarding)/start"
+  });
+  console.log(request?.redirectUri);
 
-  // const signin = async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices(); // Check if Google Play Services are available
-  //     const user = await GoogleSignin.signIn(); // Sign in the user
-  //     setUserInfo(user); // Store user info in state
-  //     setError(null); // Reset error
-  //   } catch (e) {
-  //     if (e instanceof Error) {
-  //       setError(e.message || 'An error occurred'); // Set error message
-  //     } else {
-  //       setError('An unknown error occurred');
-  //     }
-  //   }
-  // };
-
-  // const logout = async () => {
-  //   try {
-  //     await GoogleSignin.revokeAccess(); // Revoke access if necessary
-  //     await GoogleSignin.signOut(); // Sign out the user
-  //     setUserInfo(null); // Reset user info
-  //     setError(null); // Reset error
-  //   } catch (e) {
-  //     setError(e.message || 'An error occurred during logout'); // Handle logout errors
-  //   }
-  // };
+  // Function to handle login submission
+  React.useEffect(() => {
+    if (response?.type == "success") {
+      console.log("Success!, signing in");
+      const {id_token} = response.params;
+      const credential = GoogleAuthProvider.credential(id_token);
+      signInWithCredential(auth, credential)
+    }
+  }, [response]);
+  
+  React.useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log(JSON.stringify(user, null, 2));
+        setUserInfo(user);
+        await AsyncStorage.setItem("@user", JSON.stringify(user));
+      } else {
+        console.log("User is not authenticated");
+      }
+    });
+  
+    return () => unsub();
+  }, []);
 
   return (
     <ParallaxScrollView
@@ -59,15 +66,7 @@ export default function App() {
       </View>
       <View style={styles.titleContainer}>
         {/* {error && <Text style={styles.errorText}>{error}</Text>} */}
-        <Button title="Start" onPress={() => router.push('../(auth)/login')} />
-        {/* {userInfo ? (
-          <>
-            <Text>{JSON.stringify(userInfo)}</Text>
-            <Button title="Logout" onPress={logout} />
-          </>
-        ) : (
-          <GoogleSigninButton size={GoogleSigninButton.Size.Standard} onPress={signin} />
-        )} */}
+        <Button title="Sign In with Google" onPress={() => promptAsync()} />
       </View>
     </ParallaxScrollView>
   );

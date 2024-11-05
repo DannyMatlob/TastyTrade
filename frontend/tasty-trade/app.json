@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "tasty-trade",
-    "slug": "tasty-trade",
+    "name": "tastytrade",
+    "slug": "tastytrade",
+    "scheme": "com.tasty.tastytrade",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -21,8 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tasty.TastyTrade",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.tasty.tastytrade"
     },
     "web": {
       "bundler": "metro",
@@ -31,15 +30,21 @@
     },
     "plugins": [
       "expo-router",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      ["expo-location", 
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow TastyTrade to use your location."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "eas": {
-        "projectId": "69cc42f0-ebdb-41bc-8a98-be28bfcf6139"
+        "projectId": "f9a746b3-555d-46d8-ad40-249d8f9972c7"
       }
-    }
+    },
+    "owner": "jawblado"
   }
 }
