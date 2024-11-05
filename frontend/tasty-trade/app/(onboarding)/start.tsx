@@ -28,7 +28,7 @@ export default function Onboarding() {
     <View style={styles.container}>
       <Text style={styles.title}>Please enable location services</Text>
       
-      <Button title="Next" disabled={location?false:true} onPress={() => console.log("next")} />
+      <Button title="Next" disabled={location?false:true} onPress={() => router.push('../(tabs)/home')} />
     </View>
   );
 }
