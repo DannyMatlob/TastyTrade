@@ -1,64 +1,34 @@
 import { Tabs, router } from 'expo-router';
 import React, { useState } from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import * as Location from 'expo-location';
 import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 
+import {app, auth} from '../../firebaseConfig'
+
 export default function Onboarding() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState<String | null>(null);
 
-  const handleSignUp = () => {
-    if (!name || !address) {
-      Alert.alert('Error', 'Please enter both a name and address.');
-    } 
-    else {
-      Alert.alert('Success', 'Sign Up successfully!');
-      router.push('../(tabs)/home');
-    }
+  React.useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
 
-    // Example login logic (replace with real authentication logic)
-  };
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+    console.log(location);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Provide Information</Text>
+      <Text style={styles.title}>Please enable location services</Text>
       
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize='words'
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={address}
-        onChangeText={setAddress}
-        autoCapitalize='words'
-      />
-      <Button title="Sign Up" onPress={handleSignUp} />
+      <Button title="Next" disabled={location?false:true} onPress={() => console.log("next")} />
     </View>
   );
 }
