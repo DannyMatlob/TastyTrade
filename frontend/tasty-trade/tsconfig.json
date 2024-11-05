@@ -1,5 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
+  "typeRoots": ["./types"],
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
@@ -13,6 +14,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "types/env.d.ts"
   ]
 }
