@@ -29,7 +29,7 @@ export default function App() {
                 .then((result) => {
                     // Sets current user to UserContext.
                     setUser({email: result.user.email, name: result.user.displayName, uid: result.user.uid});
-                    // TODO: Register user to firebase DB if it doesn't exist.
+                    // TODO: Register user to firebase DB if they don't exist.
                 })
                 .catch((error) => {
                     console.error("Fatal error signing in: ", error);
