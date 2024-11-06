@@ -2,7 +2,7 @@ import React, {createContext, useState, ReactNode, useContext} from 'react';
 
 // Should be enough for basic usages. Use UID to locate a specific user in firebase DB.
 interface User {
-    uid: string;
+    uid: string | null;
     name: string | null;
     email: string | null;
 }
