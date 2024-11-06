@@ -1,4 +1,4 @@
-import React, {createContext, useState, ReactNode} from 'react';
+import React, {createContext, useState, ReactNode, useContext} from 'react';
 
 // Should be enough for basic usages. Use UID to locate a specific user in firebase DB.
 interface User {
@@ -25,3 +25,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         </UserContext.Provider>
     );
 };
+
+export const useUser = () => {
+    const context = useContext(UserContext);
+    if (!context) {
+        throw new Error('UserProvider not being hooked to pages correctly! [UserContext.tsx]');
+    }
+    return context;
+}
