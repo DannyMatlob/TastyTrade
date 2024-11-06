@@ -4,6 +4,7 @@ This is a food-sharing app to reduce food waste!
 
 ## Requirements
 Install NPM (Installation: [Link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
+
 Make sure to put the .env file in frontend/tasty-trade after retrieving it from a safe location
 
 ## Installation
