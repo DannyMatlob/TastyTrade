@@ -1,10 +1,8 @@
-import { Tabs, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 
 import * as Location from 'expo-location';
-import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
-
-import {app, auth} from '../../firebaseConfig'
+import { StyleSheet, Text, View, Button } from 'react-native';
 
 export default function Onboarding() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -21,7 +19,6 @@ export default function Onboarding() {
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
     })();
-    console.log(location);
   }, []);
 
   return (
