@@ -18,7 +18,7 @@ export default function App() {
     });
 
     // Hook from UserContext to set the current, global user for the application.
-    const { setUser, user } = useUser();
+    const { setUser } = useUser();
 
     // Function to handle login submission.
     useEffect(() => {
