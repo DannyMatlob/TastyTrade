@@ -36,7 +36,7 @@ EXPO_PUBLIC_WEB_CLIENT_ID=
 
 ## Installation
 
-1. Switch to ../frontend (Using cd command) after cloning Repository.
+1. Switch to ../frontend (Using cd command) after cloning the repository.
    <br><br>
 2. Install the EAS client and Expo globally.
 ```bash
