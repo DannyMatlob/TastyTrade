@@ -1,14 +1,42 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import * as Location from 'expo-location';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
+import { useUser } from "../UserContext";
+import { db } from "@/firebaseConfig";
+import { doc, updateDoc, GeoPoint } from 'firebase/firestore';
+
 export default function Onboarding() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<String | null>(null);
+  const { user } = useUser();
 
-  React.useEffect(() => {
+  // Stores location data to a user's firestore document.
+  const addLocationToUserDB = async (location: Location.LocationObject) => {
+    const userUID = user?.uid;
+    if (!userUID) {
+      console.error("User should be defined here... Fatal Error.");
+      return;
+    }
+
+    // Add the location geo-position to a user's DB file.
+    try {
+      await updateDoc(doc(db, "users", userUID), {
+        location: new GeoPoint(location.coords.latitude, location.coords.longitude)
+      });
+    } catch (error) {
+      console.log("Fatal error updating user location: ", error);
+    }
+  }
+
+  useEffect(() => {
+    // User is not yet loaded... wait.
+    if (user === undefined || user === null) {
+      return;
+    }
+
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -18,14 +46,15 @@ export default function Onboarding() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+      await addLocationToUserDB(location);
     })();
-  }, []);
+  }, [user]); // Adding user to deps here means function will rerun when user is loaded in.
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Please enable location services</Text>
       
-      <Button title="Next" disabled={location?false:true} onPress={() => router.push('../(tabs)/home')} />
+      <Button title="Next" disabled={!location} onPress={() => router.push('../(tabs)/home')} />
     </View>
   );
 }
