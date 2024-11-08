@@ -17,7 +17,21 @@ reduce the hundreds of billions of pounds of food waste occurring globally.
   <br><br>
 - Make sure to put the .env file in ../frontend after retrieving it from a safe location <br>
 (You'll need to make a [firebase project](https://console.firebase.google.com/) off of this repo).
-  <br><br>
+<br><br>
+Sample .env file:
+```
+# No Quotes.
+EXPO_PUBLIC_API_KEY=
+EXPO_PUBLIC_AUTH_DOMAIN=
+EXPO_PUBLIC_PROJECT_ID=
+EXPO_PUBLIC_STORAGE_BUCKET=
+EXPO_PUBLIC_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_APP_ID=
+EXPO_PUBLIC_MEASUREMENT_ID=
+EXPO_PUBLIC_ANDROID_CLIENT_ID=
+EXPO_PUBLIC_WEB_CLIENT_ID=
+```
+  
 - EAS Account (You'll need to sign in inside a terminal).
 
 ## Installation
