@@ -1,3 +1,27 @@
+/**
+ * UserContext.tsx Notes:
+ *   Retrieving the current user in asynchronous situations or time-demanding scenarios
+ *   can lead to issues where the user can end up being undefined while information loads in.
+ *
+ *   To remedy this, add the user to React.useEffect's deps like so:
+ *     import { useUser } from '../UserContext';
+ *     import { useEffect } from 'react';
+ *
+ *     const { user } = useUser();
+ *
+ *     useEffect(() => {
+ *       if (user === undefined || user === null) { return; }
+ *
+ *       ...
+ *       Code Logic
+ *       ...
+ *
+ *     }, [user]);
+ *
+ *   This means that while the user isn't loaded, your function won't run. However, when the value of 'user' changes,
+ *   useEffect() will run, and it will fix undefined or null issues [See example in (onboarding)/start.tsx].
+ */
+
 import React, {createContext, useState, ReactNode, useContext} from 'react';
 
 // Should be enough for basic usages. Use UID to locate a specific user in firebase DB.
