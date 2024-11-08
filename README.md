@@ -10,7 +10,7 @@ This is a food-sharing app to reduce food waste!
 ## Requirements
 - Install NPM (Installation: [Link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
   <br><br/>
-- Make sure to put the .env file in frontend/tasty-trade after retrieving it from a safe location
+- Make sure to put the .env file in ../frontend after retrieving it from a safe location
 (You'll need to make a firebase project off of this repo).
   <br><br/>
 - EAS Account (You'll need to sign in inside a terminal).
