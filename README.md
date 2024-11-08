@@ -3,8 +3,8 @@
 Americans waste roughly $400 billion each year on food. <br>
 Worldwide, food waste accounts for 11% of the world's greenhouse gas emissions! 
 
-TastyTrade is a react-native, food-sharing app with a goal to help <br>
-reduce the hundreds of billions of pounds of food waste occurring globally.
+TastyTrade is a **react-native,** food-sharing app with a goal to help <br>
+reduce hundreds of billions of pounds of food waste occurring globally.
 
 
 ## Features
