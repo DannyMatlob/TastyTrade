@@ -16,7 +16,7 @@ reduce the hundreds of billions of pounds of food waste occurring globally.
 - Install NPM (Installation: [Link](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
   <br><br>
 - Make sure to put the .env file in ../frontend after retrieving it from a safe location <br>
-(You'll need to make a firebase project off of this repo).
+(You'll need to make a [firebase project](https://console.firebase.google.com/) off of this repo).
   <br><br>
 - EAS Account (You'll need to sign in inside a terminal).
 
