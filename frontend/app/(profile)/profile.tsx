@@ -32,7 +32,6 @@ export default function HomeScreen() {
                 console.log("Fatal error signing out: ", error);
             }
         }, 1000)
-
     }
 
     return (

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { initializeAuth, inMemoryPersistence } from "firebase/auth";
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -11,8 +12,8 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_MEASUREMENT_ID
 };
 
-console.log(process.env.EXPO_PUBLIC_API_KEY);
 export const app = initializeApp(firebaseConfig);
 export const auth = initializeAuth(app, {
   persistence: inMemoryPersistence,
 })
+export const db = getFirestore(app);

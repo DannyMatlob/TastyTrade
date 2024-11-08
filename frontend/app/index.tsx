@@ -3,10 +3,10 @@ import React, { useEffect } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 
-// Authentication imports.
 import * as Google from "expo-auth-session/providers/google";
 import { GoogleAuthProvider, signInWithCredential, } from "firebase/auth"
-import { auth } from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { useUser } from "./UserContext";
 
@@ -20,6 +20,27 @@ export default function App() {
     // Hook from UserContext to set the current, global user for the application.
     const { setUser } = useUser();
 
+    const registerUserIfAbsent = async (user: { uid: string; name: string | null; email: string | null }) => {
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            // Create a new user if they do not exist.
+            if (!userDoc.exists()) {
+                await setDoc(userDocRef, {
+                    email: user.email,
+                    name: user.name,
+                    uid: user.uid,
+                    createdOn: new Date(),
+                    chats: {},
+                    posts: {},
+                });
+            }
+        } catch (error) {
+            console.error("Error with Firestore: ", error);
+        }
+    }
+
     // Function to handle login submission.
     useEffect(() => {
         if (response?.type == "success") {
@@ -27,9 +48,16 @@ export default function App() {
             const credential = GoogleAuthProvider.credential(id_token);
             signInWithCredential(auth, credential)
                 .then((result) => {
+                    const user = {
+                        email: result.user.email,
+                        name: result.user.displayName,
+                        uid: result.user.uid
+                    };
+
                     // Sets current user to UserContext.
-                    setUser({email: result.user.email, name: result.user.displayName, uid: result.user.uid});
-                    // TODO: Register user to firebase DB if they don't exist.
+                    setUser(user);
+
+                    registerUserIfAbsent(user);
                 })
                 .catch((error) => {
                     console.error("Fatal error signing in: ", error);
