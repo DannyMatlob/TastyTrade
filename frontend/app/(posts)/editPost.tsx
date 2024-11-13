@@ -1,9 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
+import { Image, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
 
 import React, { useState, useEffect } from 'react';
 import { router } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
 import { postStyles, pickImage } from './createPost';
 
 const DATA = [
