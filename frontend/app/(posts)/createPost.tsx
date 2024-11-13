@@ -81,8 +81,7 @@ export default function NewPost() {
 
         <TouchableOpacity onPress={async () => {
           const imageURI = await pickImage();
-          if (imageURI != null)
-            setImage(imageURI);
+          if (imageURI != null) { setImage(imageURI); }
         }} style={postStyles.imageButton}>
           <Text style={postStyles.imageButtonText}>Select Image</Text>
           <Ionicons name="create-outline" size={20} color="black" />

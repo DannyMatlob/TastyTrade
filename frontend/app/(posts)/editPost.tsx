@@ -2,8 +2,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, router } from 'expo-router';
+import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { postStyles, pickImage } from './createPost';
 
 const DATA = [
   {
@@ -64,27 +65,6 @@ export default function editPost(id) {
       } else {
         Alert.alert('Item Not Found', `No item found with id: ${id}`);
       }};
-
-    const pickImage = async () => {
-      // Ask for permission to access media library
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permissionResult.granted) {
-        Alert.alert('Permission required', 'Permission to access the camera roll is required!');
-        return;
-      }
-  
-      // Open image picker
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-      if (!result.canceled) {
-        setImage(result.assets[0].uri); // Set the selected image URI
-      }
-    };
   
     const handleShare = () => {
       if (!image || !title || !description) {
@@ -113,42 +93,45 @@ export default function editPost(id) {
     }, []);
   
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Tasty Trade</Text>
+      <View style={postStyles.container}>
+        <View style={postStyles.header}>
+          <Text style={postStyles.headerTitle}>Tasty Trade</Text>
           <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
             <Ionicons name="person-circle-outline" size={40} color="black" />
           </TouchableOpacity>
         </View>
   
         <TouchableOpacity onPress={handleImageCancel}>
-          <Text style={styles.cancel}>Cancel Image</Text>
+          <Text style={postStyles.cancel}>Cancel Image</Text>
         </TouchableOpacity>
   
-        <Text style={styles.subTitle}>Edit Post</Text>
+        <Text style={postStyles.subTitle}>Edit Post</Text>
   
         {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
+          <Image source={{ uri: image }} style={postStyles.image} />
         ) : (
-          <View style={styles.imagePlaceholder}>
+          <View style={postStyles.imagePlaceholder}>
             <Text>No image selected</Text>
           </View>
         )}
   
-        <TouchableOpacity onPress={pickImage} style={styles.imageButton}>
-          <Text style={styles.imageButtonText}>Select Image</Text>
+        <TouchableOpacity onPress={async () => {
+          const imageURI = await pickImage();
+          if (imageURI != null) { setImage(imageURI); }
+        }} style={postStyles.imageButton}>
+          <Text style={postStyles.imageButtonText}>Select Image</Text>
           <Ionicons name="create-outline" size={20} color="black" />
         </TouchableOpacity>
   
         <TextInput
-          style={styles.input}
+          style={postStyles.input}
           placeholder="Write a title..."
           value={title}
           onChangeText={setTitle}
         />
   
         <TextInput
-          style={styles.input}
+          style={postStyles.input}
           placeholder="Write a description..."
           value={description}
           onChangeText={setDescription}
@@ -159,66 +142,3 @@ export default function editPost(id) {
       </View>
     );
   }
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: '#fff',
-      justifyContent: 'center',
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    headerTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-    },
-    cancel: {
-      color: 'black',
-      marginBottom: 10,
-    },
-    subTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 20,
-    },
-    image: {
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      alignSelf: 'center',
-      marginBottom: 20,
-    },
-    imagePlaceholder: {
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: '#eee',
-      justifyContent: 'center',
-      alignItems: 'center',
-      alignSelf: 'center',
-      marginBottom: 20,
-    },
-    imageButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 20,
-    },
-    imageButtonText: {
-      marginRight: 5,
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
-    input: {
-      borderWidth: 1,
-      borderColor: '#ccc',
-      padding: 10,
-      marginBottom: 10,
-      borderRadius: 5,
-    },
-  });
