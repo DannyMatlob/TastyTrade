@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import * as Google from "expo-auth-session/providers/google";
 import { GoogleAuthProvider, signInWithCredential, } from "firebase/auth"
 import { auth, db } from "@/firebaseConfig";
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { useUser } from "./UserContext";
 
@@ -32,10 +32,16 @@ export default function App() {
                     name: user.name,
                     uid: user.uid,
                     createdOn: new Date(),
+                    lastOnline: new Date(),
                     chats: {},
                     posts: {},
                 });
             }
+
+            // Update last online date for user.
+            await updateDoc(userDocRef, {
+                lastOnline: new Date()
+            });
         } catch (error) {
             console.error("Error with Firestore: ", error);
         }
