@@ -79,12 +79,6 @@ export default function editPost(id: string) {
         Alert.alert('Canceled Post Edit', 'Edit has been canceled, returned to homepage');
         router.push('../(tabs)/home')
       };
-
-    const handleImageCancel = () => {
-        if (image) {
-            setImage(null);
-        }
-    };
     
     useEffect(() => {
       // Automatically call the function when the component mounts
@@ -99,10 +93,6 @@ export default function editPost(id: string) {
             <Ionicons name="person-circle-outline" size={40} color="black" />
           </TouchableOpacity>
         </View>
-  
-        <TouchableOpacity onPress={handleImageCancel}>
-          <Text style={postStyles.cancel}>Cancel Image</Text>
-        </TouchableOpacity>
   
         <Text style={postStyles.subTitle}>Edit Post</Text>
   
