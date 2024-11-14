@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {Alert, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import uuid from 'react-native-uuid';
+import {createPost} from "@/app/Post";
 
 import React, {useState} from 'react';
 import {router} from 'expo-router';
@@ -74,16 +75,15 @@ export default function NewPost() {
 
       const retrievedUserData = retrievedUser.data();
 
-      const newPost = {
-        postId: postId,
-        creatorUid: user.uid,
-        creatorName: user.name,
-        imageUrl: imageUrl,
-        postCreationDate: new Date(),
-        title: title,
-        description: description,
-        location: retrievedUserData?.location,
-      };
+      const newPost = createPost(
+          title,
+          imageUrl,
+          postId,
+          new Date(),
+          description,
+          retrievedUserData?.location,
+          user.uid,
+          user.name);
 
       // Add postId to user in database.
       await updateDoc(userRef, {
