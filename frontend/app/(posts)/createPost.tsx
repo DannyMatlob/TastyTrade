@@ -40,6 +40,7 @@ export default function NewPost() {
         Alert.alert('Error', 'Please complete all fields.');
         return;
       }
+
       // Logic for sharing the post (e.g., upload to backend)
       Alert.alert('Success', 'Post shared successfully!');
       router.push('../(tabs)/home')
@@ -101,8 +102,10 @@ export default function NewPost() {
           onChangeText={setDescription}
         />
 
-        <Button title="Share" color='#4CAF50' onPress={handleShare}/>
-        <Button title="Cancel" color='#4CAF50' onPress={handleCancel}/>
+        <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
+        <View style={{ marginTop: 10 }}>
+          <Button title="Cancel" color="#FF0000" onPress={handleCancel} />
+        </View>
       </View>
     );
   }
