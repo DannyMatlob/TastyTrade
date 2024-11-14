@@ -50,7 +50,7 @@ const DATA = [
   },
 ];
 
-export default function editPost(id: string) {
+export default function editPost(postId: string) {
     const [image, setImage] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -76,7 +76,6 @@ export default function editPost(id: string) {
     };
 
     const handleCancel = () => {
-        Alert.alert('Canceled Post Edit', 'Edit has been canceled, returned to homepage');
         router.push('../(tabs)/home')
       };
     
@@ -127,7 +126,7 @@ export default function editPost(id: string) {
         />
   
         <Button title="Share" onPress={handleShare}/>
-        <Button title="Cancel" onPress={handleCancel}/>
+        <Button title="Cancel" onPress={() => router.push('../(tabs)/home')} />
       </View>
     );
   }

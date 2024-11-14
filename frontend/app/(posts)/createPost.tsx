@@ -110,10 +110,6 @@ export default function NewPost() {
     }
   }
 
-  const handleCancel = () => {
-    router.push('../(tabs)/home')
-  };
-
   return (
       <View style={postStyles.container}>
         <View style={postStyles.header}>
@@ -157,7 +153,7 @@ export default function NewPost() {
 
         <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
         <View style={{ marginTop: 10 }}>
-          <Button title="Cancel" color="#FF0000" onPress={handleCancel} />
+          <Button title="Cancel" color="#FF0000" onPress={() => router.push('../(tabs)/home')} />
         </View>
       </View>
   );
