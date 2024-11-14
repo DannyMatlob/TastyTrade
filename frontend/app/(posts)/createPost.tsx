@@ -85,7 +85,7 @@ export default function NewPost() {
       await setDoc(postRef, newPost);
 
       Alert.alert('Success', 'Post created successfully!');
-      router.push('../(tabs)/home')
+      router.push('../(tabs)/post');
     } catch (error) {
       console.error('Error creating post: ', error);
       Alert.alert('Error', "Failed to share the post. Please try again.")
@@ -153,7 +153,7 @@ export default function NewPost() {
 
         <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
         <View style={{ marginTop: 10 }}>
-          <Button title="Cancel" color="#FF0000" onPress={() => router.push('../(tabs)/home')} />
+          <Button title="Cancel" color="#FF0000" onPress={() => router.push('../(tabs)/post')} />
         </View>
       </View>
   );
