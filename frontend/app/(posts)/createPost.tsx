@@ -47,30 +47,17 @@ export default function NewPost() {
     };
 
     const handleCancel = () => {
-        Alert.alert('Canceled Post Creation', 'Post has been canceled, returned to homepage');
         router.push('../(tabs)/home')
       };
-
-    const handleImageCancel = () => {
-        if (image) {
-            setImage(null);
-        }
-    };
 
     return (
       <View style={postStyles.container}>
         <View style={postStyles.header}>
-          <Text style={postStyles.headerTitle}>Tasty Trade</Text>
+          <Text style={postStyles.headerTitle}>New Post</Text>
           <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
             <Ionicons name="person-circle-outline" size={40} color="black" />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={handleImageCancel}>
-          <Text style={postStyles.cancel}>Cancel Image</Text>
-        </TouchableOpacity>
-
-        <Text style={postStyles.subTitle}>New Post</Text>
 
         {image ? (
           <Image source={{ uri: image }} style={postStyles.image} />
@@ -124,7 +111,7 @@ export default function NewPost() {
       marginBottom: 20,
     },
     headerTitle: {
-      fontSize: 24,
+      fontSize: 28,
       fontWeight: 'bold',
     },
     cancel: {
