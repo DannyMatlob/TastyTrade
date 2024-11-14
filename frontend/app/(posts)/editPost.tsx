@@ -50,12 +50,12 @@ const DATA = [
   },
 ];
 
-export default function editPost(id) {
+export default function editPost(id: string) {
     const [image, setImage] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
   
-    const setInfo = (id) => {
+    const setInfo = (id: string) => {
       const item = DATA.find((item) => item.id === id); // Find the item with the specific id
       if (item) {
         setTitle(item.title);
