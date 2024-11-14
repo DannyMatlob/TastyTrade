@@ -49,7 +49,7 @@ export default function NewPost() {
       return;
     }
 
-    if (!user || !user.uid) {
+    if (!user || !user.uid || !user.name) {
       console.error("User is not available... fatal error!");
       return;
     }
@@ -66,7 +66,8 @@ export default function NewPost() {
 
       const newPost = {
         postId: postId,
-        userUid: user.uid,
+        creatorUid: user.uid,
+        creatorName: user.name,
         imageUrl: imageUrl,
         postCreationDate: new Date(),
         title: title,
