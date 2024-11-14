@@ -1,11 +1,10 @@
 import { Tabs } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 
 
 export default function TabLayout() {
@@ -29,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="post"
         options={{
-          title: 'Post',
+          title: 'My Posts',
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons name={focused ? 'food-outline' : 'food-outline'} color={color} size={focused ? 30 : 25}/>
           ),
