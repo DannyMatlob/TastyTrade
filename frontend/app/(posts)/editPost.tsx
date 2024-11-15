@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 
 import React, { useState, useEffect } from 'react';
 import { router } from 'expo-router';
@@ -9,10 +10,25 @@ import { db, storage } from '@/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
-export default function editPost(postId: string) {
+export default function editPost() {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+
+    // Variable name "args" needs to match the variable name in handleDetails() of post.tsx.
+    const { args } = useLocalSearchParams();
+
+    let postId = "";
+
+    if (typeof args === 'string') {
+      postId = args;
+    }
+
+    if (!args || Array.isArray(args)) {
+      console.error("PostID could not be retrieved to edit your post! Too many arguments?");
+      router.push('../(tabs)/post');
+      return;
+    }
 
     // Retrieve a reference to a post given a postId.
     const docRef = doc(db, "posts", postId);
