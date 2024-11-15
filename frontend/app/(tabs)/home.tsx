@@ -1,14 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform, View, Text, TextInput, Button, Alert, TouchableOpacity, FlatList} from 'react-native';
+import { StyleSheet, Image, View, Text, Alert, TouchableOpacity, FlatList} from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import React, { useState } from 'react';
-import { Tabs, router } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
+import React from 'react';
+import { router } from 'expo-router';
 
 const DATA = [
     {
