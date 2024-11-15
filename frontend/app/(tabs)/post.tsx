@@ -9,9 +9,12 @@ import {useUser} from '../UserContext';
 import {doc, getDoc} from "firebase/firestore";
 import {db} from "@/firebaseConfig";
 
-// TODO: Fix arguments not properly sending to editPost.tsx.
-const handleDetails = (arg) => {
-    router.push('../(posts)/editPost', arg)
+/** Accepts a postID as a parameter. Sends the argument to editPost.tsx for processing. */
+const handleDetails = (args: string) => {
+    router.push({
+      pathname: '../(posts)/editPost',
+      params: { args }
+    });
   }
 
   type ItemProps = {
