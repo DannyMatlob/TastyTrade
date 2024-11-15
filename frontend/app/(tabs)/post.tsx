@@ -17,22 +17,22 @@ const handleDetails = (args: string) => {
     });
   }
 
-  type ItemProps = {
-    post: Post;
-  }
+type ItemProps = {
+  post: Post;
+}
 
-  // Represents a displayable "Post" visual element.
-  const Item = ({ post }: ItemProps) => (
-    <View style={styles.item}>
-      <Image source={{ uri: post.imageUrl }} style={styles.image} />
-      <View style={styles.info}>
-        <Text style={styles.title}>{post.title}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => handleDetails(post.postId)}>
-          <Text style={styles.buttonText}>Edit Post</Text>
-        </TouchableOpacity>
-      </View>
+// Represents a displayable "Post" visual element.
+const Item = ({ post }: ItemProps) => (
+  <View style={styles.item}>
+    <Image source={{ uri: post.imageUrl }} style={styles.image} />
+    <View style={styles.info}>
+      <Text style={styles.title}>{post.title}</Text>
+      <TouchableOpacity style={styles.button} onPress={() => handleDetails(post.postId)}>
+        <Text style={styles.buttonText}>Edit Post</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
 
 export default function MyPost() {
   const [posts, setPosts] = useState<Post[]>([]);
