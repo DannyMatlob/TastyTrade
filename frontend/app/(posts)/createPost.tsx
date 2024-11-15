@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import {useUser} from '../UserContext';
 import {db, storage} from '@/firebaseConfig';
-import {arrayUnion, doc, setDoc, updateDoc} from 'firebase/firestore';
+import {arrayUnion, doc, setDoc, getDoc, updateDoc} from 'firebase/firestore';
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 
 /** Returns the URI (Resource location) for an image so consumers can use setImage(URI) to apply an image. */
@@ -64,6 +64,16 @@ export default function NewPost() {
         return;
       }
 
+      const userRef = doc(db, "users", user.uid);
+      const retrievedUser = await getDoc(userRef);
+
+      if (!retrievedUser.exists()) {
+        console.error(`Could not retrieve user: [${user.uid}]!`);
+        return;
+      }
+
+      const retrievedUserData = retrievedUser.data();
+
       const newPost = {
         postId: postId,
         creatorUid: user.uid,
@@ -71,11 +81,11 @@ export default function NewPost() {
         imageUrl: imageUrl,
         postCreationDate: new Date(),
         title: title,
-        description: description
+        description: description,
+        location: retrievedUserData?.location,
       };
 
       // Add postId to user in database.
-      const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         posts: arrayUnion(postId)
       });
