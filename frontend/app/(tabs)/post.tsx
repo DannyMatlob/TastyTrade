@@ -11,11 +11,11 @@ import {db} from "@/firebaseConfig";
 
 /** Accepts a postID as a parameter. Sends the argument to editPost.tsx for processing. */
 const handleDetails = (args: string) => {
-    router.push({
-      pathname: '../(posts)/editPost',
-      params: { args }
-    });
-  }
+  router.push({
+    pathname: '../(posts)/editPost',
+    params: { args }
+  });
+}
 
 type ItemProps = {
   post: Post;
