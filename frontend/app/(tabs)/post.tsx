@@ -50,6 +50,7 @@ export default function MyPost() {
     }
   }, [user]);
 
+  // TODO: Rename this function to retrievePosts.
   /** Given a user's UID, retrieve all postIDs in the 'users' database and use setPosts() to return all posts. */
   const retrievePostIds = async (userUid: string | null) => {
     if (!userUid) {
