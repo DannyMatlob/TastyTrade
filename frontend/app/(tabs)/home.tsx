@@ -29,7 +29,7 @@ export default function MyPost() {
   // Sets posts that should be displayed to the current user.
   useEffect(() => {
     // Wait for the current user's information to be loaded.
-    if (user === undefined || user === null || !user.uid) { return; }
+    if (user === undefined || user === null) { return; }
 
     try {
       retrievePosts();
