@@ -44,6 +44,7 @@ export default function MyPost() {
     if (user === undefined || user === null) { return; }
 
     try {
+      // TODO: Refactor this so user.uid is a string, not string | null.
       retrievePostIds(user.uid);
     } catch (error) {
       console.log(`Error fetching user posts: ${error}`);
