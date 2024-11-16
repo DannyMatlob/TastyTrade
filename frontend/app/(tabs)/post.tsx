@@ -17,6 +17,7 @@ const handleDetails = (args: string) => {
   });
 }
 
+// 'Item' visual element requires a wrapper for Post.
 type ItemProps = {
   post: Post;
 }
