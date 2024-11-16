@@ -9,6 +9,7 @@ export interface Post {
   location: GeoPoint;
   creatorUid: string;
   creatorName: string;
+  distanceFromUser: number;
 }
 
 export const createPost = (
@@ -30,5 +31,6 @@ export const createPost = (
     location,
     creatorUid,
     creatorName,
+    distanceFromUser: -1,
   };
 };

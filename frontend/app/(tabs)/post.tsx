@@ -75,7 +75,8 @@ export default function MyPost() {
             return postDocSnap.data() as Post;
           } else {
             return null;
-          }});
+          }
+        });
 
         const postsData = await Promise.all(postPromises);
         const validPostsData = postsData.filter((post) => post !== null) as Post[];
