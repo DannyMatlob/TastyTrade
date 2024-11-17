@@ -42,19 +42,17 @@ export default function MyPost() {
   // Grabs all the current user's posts to display in the post tab.
   useEffect(() => {
     // Wait for the current user's information to be loaded.
-    if (user === undefined || user === null) { return; }
+    if (user === undefined || user === null || !user.uid) { return; }
 
     try {
-      // TODO: Refactor this so user.uid is a string, not string | null.
-      retrievePostIds(user.uid);
+      retrievePostsForCurrentUser(user.uid);
     } catch (error) {
       console.log(`Error fetching user posts: ${error}`);
     }
   }, [user]);
 
-  // TODO: Rename this function to retrievePostsForCurrentUser.
   /** Given a user's UID, retrieve all postIDs in the 'users' database and use setPosts() to return all posts. */
-  const retrievePostIds = async (userUid: string | null) => {
+  const retrievePostsForCurrentUser = async (userUid: string) => {
     if (!userUid) {
       console.error("User ID is null...");
       return;
