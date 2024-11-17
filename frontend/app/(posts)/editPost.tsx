@@ -149,9 +149,21 @@ export default function editPost() {
           onChangeText={setDescription}
         />
 
-        <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
-        <View style={{ marginTop: 10 }}>
-          <Button title="Cancel" color="#FF0000" onPress={() => router.push('../(tabs)/post')} />
+        <View style={{ gap: 10 }}>
+          <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
+          <Button title="Cancel" color='#FFA500' onPress={() => router.push('../(tabs)/post')}/>
+        </View>
+
+        <View style={{ marginTop: 40 }}>
+          <TouchableOpacity onPress={() => router.push('../(tabs)/post')} style={{
+            backgroundColor: '#FF0000',
+            padding: 10,
+            borderRadius: 5,
+            borderWidth: 2,
+            alignItems: 'center',
+          }}>
+            <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 17 }}>Delete Post</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
