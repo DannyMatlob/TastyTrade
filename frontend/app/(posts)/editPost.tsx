@@ -111,6 +111,13 @@ export default function editPost() {
     retrieveAndSetInfo(postId);
   }, [postId]); // postId added so retrieveAndSetInfo() is only called whenever postId changes (which shouldn't).
 
+  const confirmPostDeletionPrompt = () => {
+    Alert.alert('Confirm Post Deletion!', "This will delete all images\nand chats related to the post.", [
+      { text: "Confirm", onPress: () => deletePost(), style: "destructive" },
+      { text: "Cancel", style: "cancel" }],
+      { cancelable: false });
+  }
+
   /** Removes a post from the firebase database.
    *  This means deleting the post from the 'posts' and the postId from a user's document.
    *  Moreover, the image that was uploaded to firebase's storage also needs to be deleted. */
@@ -137,6 +144,8 @@ export default function editPost() {
     } catch (error) {
       console.error(`Could not delete post: ${error}`);
     }
+
+    router.push('../(tabs)/post');
   }
   
   return (
@@ -186,8 +195,7 @@ export default function editPost() {
 
       <View style={{ marginTop: 40 }}>
         <TouchableOpacity onPress={() => {
-          deletePost();
-          router.push('../(tabs)/post');
+          confirmPostDeletionPrompt();
         }} style={{
           backgroundColor: '#FF0000',
           padding: 10,
