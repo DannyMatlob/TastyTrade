@@ -11,76 +11,77 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export default function editPost() {
-    const [imageUri, setImageUri] = useState<string | null>(null);
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
-    // Variable name "args" needs to match the variable name in handleDetails() of post.tsx.
-    const { args } = useLocalSearchParams();
+  // Variable name "args" needs to match the variable name in handleDetails() of post.tsx.
+  const { args } = useLocalSearchParams();
 
-    let postId = "";
+  let postId = "";
 
-    if (typeof args === 'string') {
-      postId = args;
+  if (typeof args === 'string') {
+    postId = args;
+  }
+
+  if (!args || Array.isArray(args)) {
+    console.error("PostID could not be retrieved to edit your post! Too many arguments?");
+    router.push('../(tabs)/post');
+    return;
+  }
+
+  // Retrieve a reference to a post given a postId.
+  const docRef = doc(db, "posts", postId);
+
+  /** Retrieve a post and set title, description, and imageUri global values for later usages. */
+  const retrieveAndSetInfo = async (id: string) => {
+    try {
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const item = docSnap.data();
+        setTitle(item?.title ?? "No Title Found");
+        setImageUri(item?.imageUrl ?? "");
+        setDescription(item?.description ?? "No Description Found.");
+      } else {
+        Alert.alert("Item Not Found", `No item was found with the id: ${id}`);
+        console.error(`Post could not be found with given ID: ${id}. Possible matching error?`);
+        router.push('../(tabs)/post');
+      }
+    } catch (error) {
+      console.error(`Post retrieval error: ${error}`);
     }
-
-    if (!args || Array.isArray(args)) {
-      console.error("PostID could not be retrieved to edit your post! Too many arguments?");
-      router.push('../(tabs)/post');
+  };
+  
+  const handleShare = async () => {
+    if (!imageUri || !title || !description) {
+      Alert.alert('Error', 'Please complete all fields.');
       return;
     }
 
-    // Retrieve a reference to a post given a postId.
-    const docRef = doc(db, "posts", postId);
+    try {
+      const newImageUri = await uploadImage(postId);
 
-    /** Retrieve a post and set title, description, and imageUri global values for later usages. */
-    const retrieveAndSetInfo = async (id: string) => {
-      try {
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const item = docSnap.data();
-          setTitle(item?.title ?? "No Title Found");
-          setImageUri(item?.imageUrl ?? "");
-          setDescription(item?.description ?? "No Description Found.");
-        } else {
-          Alert.alert("Item Not Found", `No item was found with the id: ${id}`);
-          console.error(`Post could not be found with given ID: ${id}. Possible matching error?`);
-          router.push('../(tabs)/post');
-        }
-      } catch (error) {
-        console.error(`Post retrieval error: ${error}`);
-      }};
-  
-    const handleShare = async () => {
-      if (!imageUri || !title || !description) {
-        Alert.alert('Error', 'Please complete all fields.');
+      if (!newImageUri) {
+        console.error("Error with uploadImage() function in editPost.tsx.");
         return;
       }
 
-      try {
-        const newImageUri = await uploadImage(postId);
+      await updateDoc(docRef, {
+        title: title,
+        description: description,
+        imageUrl: newImageUri
+      });
 
-        if (!newImageUri) {
-          console.error("Error with uploadImage() function in editPost.tsx.");
-          return;
-        }
+      Alert.alert('Success', 'Post edited successfully!');
+      router.push('../(tabs)/post');
+    } catch (error) {
+      console.error('Error editing post: ${error}');
+      Alert.alert('Error', "Failed to edit the post. Please try again.")
+    }
+  };
 
-        await updateDoc(docRef, {
-          title: title,
-          description: description,
-          imageUrl: newImageUri
-        });
-
-        Alert.alert('Success', 'Post edited successfully!');
-        router.push('../(tabs)/post');
-      } catch (error) {
-        console.error('Error editing post: ${error}');
-        Alert.alert('Error', "Failed to edit the post. Please try again.")
-      }
-    };
-
-    const uploadImage = async (postId: string) => {
+  const uploadImage = async (postId: string) => {
     if (!imageUri) {
       throw "Image has not been correctly set!";
     }
@@ -103,68 +104,67 @@ export default function editPost() {
     }
   }
     
-    useEffect(() => {
-      // Automatically call the function when the component mounts.
-      retrieveAndSetInfo(postId);
-    }, [postId]); // postId added so retrieveAndSetInfo() is only called whenever postId changes (which shouldn't).
+  useEffect(() => {
+    // Automatically call the function when the component mounts.
+    retrieveAndSetInfo(postId);
+  }, [postId]); // postId added so retrieveAndSetInfo() is only called whenever postId changes (which shouldn't).
   
-    return (
-      <View style={postStyles.container}>
-        <View style={postStyles.header}>
-          <Text style={postStyles.headerTitle}>Tasty Trade</Text>
-          <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
-            <Ionicons name="person-circle-outline" size={40} color="black" />
-          </TouchableOpacity>
-        </View>
-  
-        <Text style={postStyles.subTitle}>Edit Post</Text>
-  
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={postStyles.image} />
-        ) : (
-          <View style={postStyles.imagePlaceholder}>
-            <Text>No image selected</Text>
-          </View>
-        )}
-  
-        <TouchableOpacity onPress={async () => {
-          const imageURI = await pickImage();
-          if (imageURI != null) { setImageUri(imageURI); }
-        }} style={postStyles.imageButton}>
-          <Text style={postStyles.imageButtonText}>Select Image</Text>
-          <Ionicons name="create-outline" size={20} color="black" />
+  return (
+    <View style={postStyles.container}>
+      <View style={postStyles.header}>
+        <Text style={postStyles.headerTitle}>Tasty Trade</Text>
+        <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
+          <Ionicons name="person-circle-outline" size={40} color="black" />
         </TouchableOpacity>
-  
-        <TextInput
-          style={postStyles.input}
-          placeholder="Write a title..."
-          value={title}
-          onChangeText={setTitle}
-        />
-  
-        <TextInput
-          style={postStyles.input}
-          placeholder="Write a description..."
-          value={description}
-          onChangeText={setDescription}
-        />
-
-        <View style={{ gap: 10 }}>
-          <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
-          <Button title="Cancel" color='#FFA500' onPress={() => router.push('../(tabs)/post')}/>
-        </View>
-
-        <View style={{ marginTop: 40 }}>
-          <TouchableOpacity onPress={() => router.push('../(tabs)/post')} style={{
-            backgroundColor: '#FF0000',
-            padding: 10,
-            borderRadius: 5,
-            borderWidth: 2,
-            alignItems: 'center',
-          }}>
-            <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 17 }}>Delete Post</Text>
-          </TouchableOpacity>
-        </View>
       </View>
-    );
-  }
+  
+      <Text style={postStyles.subTitle}>Edit Post</Text>
+  
+      {imageUri ?
+        (<Image source={{ uri: imageUri }} style={postStyles.image} />) :
+        (<View style={postStyles.imagePlaceholder}>
+          <Text>No image selected</Text>
+        </View>)
+      }
+  
+      <TouchableOpacity onPress={async () => {
+        const imageURI = await pickImage();
+        if (imageURI != null) { setImageUri(imageURI); }
+      }} style={postStyles.imageButton}>
+        <Text style={postStyles.imageButtonText}>Select Image</Text>
+        <Ionicons name="create-outline" size={20} color="black" />
+      </TouchableOpacity>
+  
+      <TextInput
+        style={postStyles.input}
+        placeholder="Write a title..."
+        value={title}
+        onChangeText={setTitle}
+      />
+  
+      <TextInput
+        style={postStyles.input}
+        placeholder="Write a description..."
+        value={description}
+        onChangeText={setDescription}
+      />
+
+      <View style={{ gap: 10 }}>
+        <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
+        <Button title="Cancel" color='#FFA500' onPress={() => router.push('../(tabs)/post')}/>
+      </View>
+
+      <View style={{ marginTop: 40 }}>
+        <TouchableOpacity onPress={() => router.push('../(tabs)/post')} style={{
+          backgroundColor: '#FF0000',
+          padding: 10,
+          borderRadius: 5,
+          borderWidth: 2,
+          alignItems: 'center',
+        }}>
+          <Text style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 17 }}>Delete Post</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
