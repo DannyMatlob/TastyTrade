@@ -11,28 +11,29 @@ import {db} from "@/firebaseConfig";
 
 /** Accepts a postID as a parameter. Sends the argument to editPost.tsx for processing. */
 const handleDetails = (args: string) => {
-    router.push({
-      pathname: '../(posts)/editPost',
-      params: { args }
-    });
-  }
+  router.push({
+    pathname: '../(posts)/editPost',
+    params: { args }
+  });
+}
 
-  type ItemProps = {
-    post: Post;
-  }
+// 'Item' visual element requires a wrapper for Post.
+type ItemProps = {
+  post: Post;
+}
 
-  // Represents a displayable "Post" visual element.
-  const Item = ({ post }: ItemProps) => (
-    <View style={styles.item}>
-      <Image source={{ uri: post.imageUrl }} style={styles.image} />
-      <View style={styles.info}>
-        <Text style={styles.title}>{post.title}</Text>
-        <TouchableOpacity style={styles.button} onPress={() => handleDetails(post.postId)}>
-          <Text style={styles.buttonText}>Edit Post</Text>
-        </TouchableOpacity>
-      </View>
+// Represents a displayable "Post" visual element.
+const Item = ({ post }: ItemProps) => (
+  <View style={styles.item}>
+    <Image source={{ uri: post.imageUrl }} style={styles.image} />
+    <View style={styles.info}>
+      <Text style={styles.title}>{post.title}</Text>
+      <TouchableOpacity style={styles.button} onPress={() => handleDetails(post.postId)}>
+        <Text style={styles.buttonText}>Edit Post</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
 
 export default function MyPost() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -44,12 +45,14 @@ export default function MyPost() {
     if (user === undefined || user === null) { return; }
 
     try {
+      // TODO: Refactor this so user.uid is a string, not string | null.
       retrievePostIds(user.uid);
     } catch (error) {
       console.log(`Error fetching user posts: ${error}`);
     }
   }, [user]);
 
+  // TODO: Rename this function to retrievePostsForCurrentUser.
   /** Given a user's UID, retrieve all postIDs in the 'users' database and use setPosts() to return all posts. */
   const retrievePostIds = async (userUid: string | null) => {
     if (!userUid) {
@@ -73,7 +76,8 @@ export default function MyPost() {
             return postDocSnap.data() as Post;
           } else {
             return null;
-          }});
+          }
+        });
 
         const postsData = await Promise.all(postPromises);
         const validPostsData = postsData.filter((post) => post !== null) as Post[];
