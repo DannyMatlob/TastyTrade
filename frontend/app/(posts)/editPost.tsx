@@ -7,18 +7,20 @@ import { router } from 'expo-router';
 import { postStyles, pickImage } from './createPost';
 
 import { db, storage } from '@/firebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { arrayRemove, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
+import { useUser } from "../UserContext";
 
 export default function editPost() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const { user } = useUser();
+  let postId = "";
 
   // Variable name "args" needs to match the variable name in handleDetails() of post.tsx.
   const { args } = useLocalSearchParams();
-
-  let postId = "";
 
   if (typeof args === 'string') {
     postId = args;
@@ -60,7 +62,7 @@ export default function editPost() {
     }
 
     try {
-      const newImageUri = await uploadImage(postId);
+      const newImageUri = await uploadImage();
 
       if (!newImageUri) {
         console.error("Error with uploadImage() function in editPost.tsx.");
@@ -81,7 +83,7 @@ export default function editPost() {
     }
   };
 
-  const uploadImage = async (postId: string) => {
+  const uploadImage = async () => {
     if (!imageUri) {
       throw "Image has not been correctly set!";
     }
@@ -108,6 +110,34 @@ export default function editPost() {
     // Automatically call the function when the component mounts.
     retrieveAndSetInfo(postId);
   }, [postId]); // postId added so retrieveAndSetInfo() is only called whenever postId changes (which shouldn't).
+
+  /** Removes a post from the firebase database.
+   *  This means deleting the post from the 'posts' and the postId from a user's document.
+   *  Moreover, the image that was uploaded to firebase's storage also needs to be deleted. */
+  const deletePost = async () => {
+    if (!user || !user.uid) {
+      console.error("Current user not found when trying to delete post.");
+      return;
+    }
+
+    const userRef = doc(db, "users", user.uid);
+    const imageRef = ref(storage, `images/${postId}`);
+
+    try {
+      // Delete the post from the 'posts' collection.
+      await deleteDoc(docRef);
+
+      // Delete the postId from the current user's database file.
+      await updateDoc(userRef, {
+        posts: arrayRemove(postId)
+      })
+
+      // Delete the image related with the post from firebase storage.
+      await deleteObject(imageRef);
+    } catch (error) {
+      console.error(`Could not delete post: ${error}`);
+    }
+  }
   
   return (
     <View style={postStyles.container}>
@@ -155,7 +185,10 @@ export default function editPost() {
       </View>
 
       <View style={{ marginTop: 40 }}>
-        <TouchableOpacity onPress={() => router.push('../(tabs)/post')} style={{
+        <TouchableOpacity onPress={() => {
+          deletePost();
+          router.push('../(tabs)/post');
+        }} style={{
           backgroundColor: '#FF0000',
           padding: 10,
           borderRadius: 5,
