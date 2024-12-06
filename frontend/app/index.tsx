@@ -33,8 +33,8 @@ export default function App() {
                     uid: user.uid,
                     createdOn: new Date(),
                     lastOnline: new Date(),
-                    chats: {},
-                    posts: {},
+                    chats: [],
+                    posts: [],
                 });
             }
 
