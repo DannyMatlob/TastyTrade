@@ -64,7 +64,7 @@ export default function MyPost() {
     if (userDocSnap.exists()) {
       const postIds = userDocSnap.data().posts;
 
-      if (postIds) {
+      if (postIds && postIds.length > 0) {
         // (Inner function): For each post, retrieve the data from the "posts" database and return as a Post object.
         const postPromises = postIds.map(async (postId: string) => {
           const postDocRef = doc(db, "posts", postId);
