@@ -129,11 +129,6 @@ export default function ChatRoom() {
     });
   }, [])
 
-  useEffect(() => {
-    console.log(bubbles);
-    console.log(foodPost);
-  }, [bubbles])
-
   //Rendering Logic
   const renderMessage = ({ item } : {item: ChatBubble}) => (
     <View style={[
@@ -169,7 +164,7 @@ export default function ChatRoom() {
       <FlatList
         data={bubbles}
         renderItem={renderMessage}
-        keyExtractor={item => {item.id}}
+        keyExtractor={item => item.id.toString()}
         style={styles.messageList}
         contentContainerStyle={styles.messageListContent}
       />
