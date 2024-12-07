@@ -84,43 +84,47 @@ export default function MyChats() {
 
     //Take the raw chats data and convert it into a previews array
     const previewsData : Preview[] = [];
-    validChatsData.forEach(async (chat) => {
-      const preview : Preview = {
+    for (const chat of validChatsData) {
+      console.log("Processing chat:", chat.chatId);
+
+      const preview: Preview = {
         chatId: chat.chatId,
         userId: "",
         name: "Failed to load user name",
         lastMessage: "Failed to load last message",
-        postImg: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-k83MyoiH43lpI6Y-TY17A2JCPudD_7Av9A&s"
+        postImg: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-k83MyoiH43lpI6Y-TY17A2JCPudD_7Av9A&s",
+      };
+
+      // Determine the other user's ID
+      preview.userId = chat.user1 === userUid ? chat.user2 : chat.user1;
+
+      // Retrieve the other user's name
+      try {
+        const user2Ref = doc(db, "users", preview.userId);
+        const user2Snap = await getDoc(user2Ref);
+        preview.name = (user2Snap.data() as User)?.name || "Failed to load user name";
+      } catch (e) {
+        console.error("Failed to retrieve user:", preview.userId, e);
       }
 
-      //Set other userID
-      if (chat.user1 == userUid) {
-        preview.userId = chat.user2;
-      } else {
-        preview.userId = chat.user1;
+      // Retrieve the post image
+      try {
+        const postRef = doc(db, "posts", chat.postId);
+        const postSnap = await getDoc(postRef);
+        preview.postImg = (postSnap.data() as Post)?.imageUrl || preview.postImg;
+      } catch (e) {
+        console.error("Failed to retrieve post:", preview.userId, e);
       }
 
-      //Set other user name
-      const user2Ref = doc(db, "users", preview.userId);
-      const user2Snap = await getDoc(userDocRef);
-      if (!user2Snap.exists()) {console.error("Failed to retrieve user: ", preview.userId)}
-      preview.name = (user2Snap.data() as User).name
+      // Set the last message
+      preview.lastMessage = chat.messages[chat.messages.length - 1]?.msg || "No messages";
 
-      //Set post image
-      const postRef = doc(db, "posts", chat.postId);
-      const postSnap = await getDoc(postRef);
-      if (!postSnap.exists()) {console.error("Failed to retrieve post: ", preview.userId)}
-      preview.postImg = (postSnap.data() as Post).imageUrl
-
-      //Set last message
-      preview.lastMessage = chat.messages[chat.messages.length - 1].msg
-
-      //Push preview to previews array
+      // Add the preview to the array
       previewsData.push(preview);
-    })
+    }
 
     setPreviews(previewsData);
-  }
+  };
 
   useEffect(() => {
     // Wait for the current user's information to be loaded.
