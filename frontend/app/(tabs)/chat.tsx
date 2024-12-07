@@ -137,10 +137,6 @@ export default function MyChats() {
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log("Current state of previews:" , previews);
-  }, [previews]);
-
   //Rendering Logic
   const renderItem = ({ item }: { item: Preview }) => (
     <ChatItem 

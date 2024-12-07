@@ -1,8 +1,8 @@
-import { GeoPoint } from "firebase/firestore";
+import { GeoPoint, Timestamp } from "firebase/firestore";
 
 export interface User {
     chats: [Chat];
-    createdOn: Date;
+    createdOn: Timestamp;
     email: string;
     location: GeoPoint;
     name: string;
@@ -21,7 +21,7 @@ export interface Chat {
 export interface Message {
   msg: string;
   owner: string;
-  timestamp: Date;
+  timestamp: Timestamp;
 }
 
 export interface Post {
