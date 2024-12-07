@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebaseConfig';
 
 const DATA = [
   {
@@ -17,7 +19,9 @@ const DATA = [
     image: 'https://assets.bonappetit.com/photos/5c62e4a3e81bbf522a9579ce/16:9/w_2580,c_limit/milk-bread.jpg',
   }
 ];
-
+interface Chat {
+  user1: String
+}
 const POST_MESSAGES = {
   '1': [ // Tomato sauce chat
     { id: '1', text: 'Hey, I saw your tomato sauce post', sender: 'other' },
@@ -39,6 +43,7 @@ export default function ChatRoom() {
   const foodPost = DATA.find(item => item.id === postId);
   const chatMessages = POST_MESSAGES[postId];
 
+  //Rendering Logic
   const renderMessage = ({ item }) => (
     <View style={[
       styles.messageBubble,

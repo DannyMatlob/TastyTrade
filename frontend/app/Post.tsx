@@ -1,16 +1,7 @@
 import { GeoPoint } from "firebase/firestore";
+import { Post } from "./interfaces";
 
-export interface Post {
-  title: string;
-  imageUrl: string;
-  postId: string;
-  postCreationDate: Date;
-  description: string;
-  location: GeoPoint;
-  creatorUid: string;
-  creatorName: string;
-  distanceFromUser: number;
-}
+
 
 export const createPost = (
     title: string,
@@ -34,3 +25,5 @@ export const createPost = (
     distanceFromUser: -1,
   };
 };
+
+export { Post };

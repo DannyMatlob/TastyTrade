@@ -1,45 +1,26 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, View, Text, TouchableOpacity, FlatList, Alert, Dimensions } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebaseConfig';
+import { useUser } from '../UserContext';
+import { Post, User, Chat } from '../interfaces';
 
-// Helper function to get last message
-const getLastMessage = (postId) => {
-  const messages = POST_MESSAGES[postId];
-  return messages[messages.length - 1].text;
-};
-
-const CHATS = [
-  {
-    id: '1',
-    name: 'John Doe',
-    lastMessage: 'Great! Would you like to trade?', // Last message from POST_MESSAGES['1']
-    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-    postId: '1'
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    lastMessage: 'Would you like to trade for some bread?', // Last message from POST_MESSAGES['3']
-    avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-    postId: '3'
-  },
-];
-
-const ChatItem = ({ name, lastMessage, avatar, postId }) => {
+const ChatItem = ({ preview } : {preview: Preview}) => {
   return (
     <View style={styles.item}>
-      <Image source={{ uri: avatar }} style={styles.image} />
+      <Image source={{uri: preview.postImg}} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.lastMessage}>{lastMessage}</Text>
+        <Text style={styles.name}>{preview.name}</Text>
+        <Text style={styles.lastMessage}>{preview.lastMessage}</Text>
       </View>
       <TouchableOpacity 
         style={styles.button} 
         onPress={() => router.push({
-          pathname: "../(chatroom)/chatroom", // Add ../ to go up one level
-          params: { name, avatar, lastMessage, postId }
+          pathname: ("../(chatroom)/chatroom/[id]"),
+          params: { id: preview.chatId }
         })}
       >
         <Ionicons name="chatbox-outline" size={24} color="white" />
@@ -48,13 +29,118 @@ const ChatItem = ({ name, lastMessage, avatar, postId }) => {
   );
 };
 
+ //In order to make it presentable, we must filter the raw chats data into the opposite user and an image of the food item
+ interface Preview {
+    userId: string;
+    chatId: string;
+    name: string;
+    lastMessage: string;
+    postImg: string; 
+ }
+
 export default function MyChats() {
-  const renderItem = ({ item }) => (
+  const [previews, setPreviews] = useState<Preview[]>([]);
+  const { user } = useUser();
+  
+  //Business Logic
+  /** Given a user's UID, retrieve all chatIds in the 'users' database */
+  const retrieveListOfChats = async (userUid: string) => {
+    console.log("\n\nRetrieving list of chats\n\n");
+    if (!userUid) {
+      console.error("User ID is null...");
+      return;
+    }
+
+    const userDocRef = doc(db, "users", userUid);
+    const userDocSnap = await getDoc(userDocRef);
+    //Handle the case where there's no user retrieved from db
+    if (!userDocSnap.exists()) {
+      console.error("Fatal error: current user could not be retrieved from the database.");
+      return;
+    }
+
+    const chatIds = userDocSnap.data().chats;
+    // Handle the case where there are no retrievable posts.
+    if (!chatIds || chatIds.length == 0) {
+      setPreviews([]);
+      return;
+    }
+
+    // For each chat, retrieve the data from the "chat" database and return as a chat object.
+    const chatPromises = chatIds.map(async (chatId: string) => {
+      const chatDocRef = doc(db, "chats", chatId);
+      const chatDocSnap = await getDoc(chatDocRef);
+
+      if (chatDocSnap.exists()) {
+        console.log()
+        return chatDocSnap.data() as Chat;
+      } else {
+        return null;
+      }
+    });
+
+    const chatsData = await Promise.all(chatPromises);
+    const validChatsData = chatsData.filter((chat) => chat !== null) as Chat[];
+
+    //Take the raw chats data and convert it into a previews array
+    const previewsData : Preview[] = [];
+    validChatsData.forEach(async (chat) => {
+      const preview : Preview = {
+        chatId: chat.chatId,
+        userId: "",
+        name: "Failed to load user name",
+        lastMessage: "Failed to load last message",
+        postImg: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-k83MyoiH43lpI6Y-TY17A2JCPudD_7Av9A&s"
+      }
+
+      //Set other userID
+      if (chat.user1 == userUid) {
+        preview.userId = chat.user2;
+      } else {
+        preview.userId = chat.user1;
+      }
+
+      //Set other user name
+      const user2Ref = doc(db, "users", preview.userId);
+      const user2Snap = await getDoc(userDocRef);
+      if (!user2Snap.exists()) {console.error("Failed to retrieve user: ", preview.userId)}
+      preview.name = (user2Snap.data() as User).name
+
+      //Set post image
+      const postRef = doc(db, "posts", chat.postId);
+      const postSnap = await getDoc(postRef);
+      if (!postSnap.exists()) {console.error("Failed to retrieve post: ", preview.userId)}
+      preview.postImg = (postSnap.data() as Post).imageUrl
+
+      //Set last message
+      preview.lastMessage = chat.messages[chat.messages.length - 1].msg
+
+      //Push preview to previews array
+      previewsData.push(preview);
+    })
+
+    setPreviews(previewsData);
+  }
+
+  useEffect(() => {
+    // Wait for the current user's information to be loaded.
+    if (user === undefined || user === null || !user.uid) { console.error("Returning, no user"); return; }
+
+    try {
+      retrieveListOfChats(user.uid);
+    } catch (error) {
+      console.error(`Error fetching user chats: ${error}`);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    console.log("Current state of previews:" , previews);
+  }, [previews]);
+
+  //Rendering Logic
+  const renderItem = ({ item }: { item: Preview }) => (
     <ChatItem 
-      name={item.name}
-      lastMessage={item.lastMessage}
-      avatar={item.avatar}
-      postId={item.postId}
+      preview={item}
     />
   );
 
@@ -67,9 +153,9 @@ export default function MyChats() {
         </TouchableOpacity>
       </View>
       <FlatList
-        data={CHATS}
+        data={previews}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.chatId}
         contentContainerStyle={styles.list}
       />
     </View>
