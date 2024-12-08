@@ -3,7 +3,7 @@ import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-n
 import Feather from '@expo/vector-icons/Feather';
 import React, {useEffect, useState} from 'react';
 import {router} from 'expo-router';
-import {Post} from "@/app/Post";
+import {Post} from "@/app/interfaces";
 import {useUser} from '../UserContext';
 
 import {doc, getDoc} from "firebase/firestore";
@@ -63,7 +63,6 @@ export default function MyPost() {
 
     if (userDocSnap.exists()) {
       const postIds = userDocSnap.data().posts;
-
       if (postIds && postIds.length > 0) {
         // (Inner function): For each post, retrieve the data from the "posts" database and return as a Post object.
         const postPromises = postIds.map(async (postId: string) => {
