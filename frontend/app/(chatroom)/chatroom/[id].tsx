@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { arrayUnion, doc, GeoPoint, getDoc, onSnapshot, Timestamp, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, deleteDoc, doc, GeoPoint, getDoc, onSnapshot, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
 import { Chat, Message, Post, User } from '@/app/interfaces';
 import { useUser } from '@/app/UserContext';
@@ -121,6 +121,31 @@ export default function ChatRoom() {
     setNewMessage('');
   }
 
+  //Logic to delete the chat from firebase
+  const deleteChatFromDatabase = async () => {
+    try {
+      const chatRef = doc(db, "chats", id as string);
+      const chatSnap = (await getDoc(chatRef)).data() as Chat;
+      const user1Ref = doc(db, "users", chatSnap.user1);
+      const user2Ref = doc(db, "users", chatSnap.user2)
+
+      // Remove the chat from the chats array in Firestore
+      await updateDoc(user1Ref, {
+        chats: arrayRemove(id),
+      });
+      await updateDoc(user2Ref, {
+        chats: arrayRemove(id),
+      });
+
+      //Delete the chat document from firebase (NOT ENABLED)
+      //await deleteDoc(chatRef);
+      console.log("Chat deleted successfully");
+      router.back();
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
+  };
+
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "chats", id as string), (doc) => {
       const source = doc.metadata.hasPendingWrites ? "Local" : "Server";
@@ -144,14 +169,45 @@ export default function ChatRoom() {
     </View>
   );
 
+  const deleteChat = () => {
+    Alert.alert(
+      "Delete Chat",
+      "Are you sure you want to delete this chat?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            // Code to delete the chat
+            console.log(`Deleting chat with ID: ${id}`);
+            // Example: Firebase deletion code
+            deleteChatFromDatabase();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <>
     {foodPost ? (
     <View style={styles.container}>
       
-      <View style={styles.header}>
-        <Text style={styles.name}>{"Chat with " + name}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10 }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{"Chat with " + name}</Text>
+        <TouchableOpacity 
+          style={{ paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'red', borderRadius: 5 }}
+          onPress={() => deleteChat()}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>Delete Chat</Text>
+        </TouchableOpacity>
       </View>
+
 
       <View style={styles.foodPostContainer}>
         <Image source={{ uri: foodPost?.image}} style={styles.foodImage} />

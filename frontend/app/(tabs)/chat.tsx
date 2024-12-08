@@ -1,9 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, View, Text, TouchableOpacity, FlatList, Alert, Dimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
 import { useUser } from '../UserContext';
 import { Post, User, Chat } from '../interfaces';
@@ -85,7 +85,6 @@ export default function MyChats() {
     //Take the raw chats data and convert it into a previews array
     const previewsData : Preview[] = [];
     for (const chat of validChatsData) {
-      console.log("Processing chat:", chat.chatId);
 
       const preview: Preview = {
         chatId: chat.chatId,
@@ -126,16 +125,18 @@ export default function MyChats() {
     setPreviews(previewsData);
   };
 
+  //This will track any changes that happen to the user document in firebase, reacting to changes in chat IDs
   useEffect(() => {
-    // Wait for the current user's information to be loaded.
     if (user === undefined || user === null || !user.uid) { console.error("Returning, no user"); return; }
-
-    try {
-      retrieveListOfChats(user.uid);
-    } catch (error) {
-      console.error(`Error fetching user chats: ${error}`);
-    }
-  }, [user]);
+    const unsub = onSnapshot(doc(db, "users", user.uid as string), (doc) => {
+      const source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+      try {
+        retrieveListOfChats(user.uid as string);
+      } catch (error) {
+        console.error(`Error fetching user chats: ${error}`);
+      }
+    });
+  }, [])
 
   //Rendering Logic
   const renderItem = ({ item }: { item: Preview }) => (
