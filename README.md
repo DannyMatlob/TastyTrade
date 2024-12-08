@@ -36,15 +36,13 @@ EXPO_PUBLIC_WEB_CLIENT_ID=
 
 ## Installation
 
-1. Switch to ../frontend (Using cd command) after cloning the repository.
-   <br><br>
-2. Install the EAS client and Expo globally.
+1. Install the EAS client and Expo globally.
 ```bash
       npm install --global eas-cli
       npm install --global expo
    ```
 
-3. Install dependencies using NPM:
+2. Install dependencies using NPM:
 ```bash
    npm install
    ```
@@ -53,8 +51,8 @@ EXPO_PUBLIC_WEB_CLIENT_ID=
 Using android emulator or physical device (AVD [Installable through Android Studio]):
 ```bash
    eas build --profile development --platform android
-   npx expo start
-   press a
+   npx expo start --android
+   press
    ```
 
 EAS will build an Android APK on the cloud, which you can then download to your mobile device through the QR code.
