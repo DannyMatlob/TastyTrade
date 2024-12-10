@@ -137,6 +137,7 @@ export default function MyChats() {
         console.error(`Error fetching user chats: ${error}`);
       }
     });
+    return () => unsub();
   }, [])
 
   //Rendering Logic

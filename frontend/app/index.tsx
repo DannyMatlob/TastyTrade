@@ -2,9 +2,10 @@ import { Image, StyleSheet, View, Button } from 'react-native';
 import React, { useEffect } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
+import { router } from "expo-router";
 
 import * as Google from "expo-auth-session/providers/google";
-import { GoogleAuthProvider, signInWithCredential, } from "firebase/auth"
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth"
 import { auth, db } from "@/firebaseConfig";
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
@@ -14,7 +15,7 @@ export default function App() {
     const [request, response, promptAsync] = Google.useAuthRequest({
         androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
         webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-        redirectUri: "com.tasty.tastytrade:/(onboarding)/start"
+        redirectUri: "com.tasty.tastytrade:/"
     });
 
     // Hook from UserContext to set the current, global user for the application.
@@ -49,7 +50,8 @@ export default function App() {
 
     // Function to handle login submission.
     useEffect(() => {
-        if (response?.type == "success") {
+        if (response?.type === "success") {
+            console.log("Success")
             const { id_token } = response.params;
             const credential = GoogleAuthProvider.credential(id_token);
             signInWithCredential(auth, credential)
@@ -64,10 +66,21 @@ export default function App() {
                     setUser(user);
 
                     registerUserIfAbsent(user);
+                    router.push('./(onboarding)/start')
                 })
                 .catch((error) => {
                     console.error("Fatal error signing in: ", error);
                 });
+        }
+        else if (response?.type === "error") {
+            console.error("Authentication error:", response.error);
+        }
+        else if (response?.type === "cancel") {
+            console.log("User cancelled the sign-in process.");
+            // Optionally inform the user that the authentication was cancelled
+        }
+        else{
+            console.log("Failure")
         }
     }, [response]);
 
@@ -81,7 +94,7 @@ export default function App() {
                 />
             }>
             <View style={styles.titleContainer}>
-                <ThemedText type="title">Welcome! to TastyTrade</ThemedText>
+                <ThemedText type="title">Welcome to TastyTrade!</ThemedText>
             </View>
             <View style={styles.titleContainer}>
                 {/* {error && <Text style={styles.errorText}>{error}</Text>} */}

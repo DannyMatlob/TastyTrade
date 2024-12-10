@@ -39,6 +39,7 @@ export default function MyPost() {
         console.log(`Error fetching user posts: ${error}`);
       }
     });
+    return () => unsub();
   }, [user]);
 
   /** Retrieves every post in the posts firebase database. Also filters posts based on certain rules. */

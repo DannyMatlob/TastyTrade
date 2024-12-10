@@ -155,6 +155,7 @@ export default function ChatRoom() {
       console.log("NEW TEXT DETECTED");
       retrieveChat();
     });
+    return () => unsub();
   }, [])
 
   //Rendering Logic
