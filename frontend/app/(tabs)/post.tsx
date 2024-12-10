@@ -1,13 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
-import React, {useEffect, useState} from 'react';
-import {router} from 'expo-router';
-import {Post} from "@/app/interfaces";
-import {useUser} from '../UserContext';
+import React, { useEffect, useState } from 'react';
+import { router } from 'expo-router';
+import { Post } from "@/app/interfaces";
+import { useUser } from '../UserContext';
 
-import {doc, getDoc} from "firebase/firestore";
-import {db} from "@/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebaseConfig";
 
 /** Accepts a postID as a parameter. Sends the argument to editPost.tsx for processing. */
 const handleDetails = (args: string) => {
@@ -37,6 +37,7 @@ const Item = ({ post }: ItemProps) => (
 
 export default function MyPost() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useUser();
 
   // Grabs all the current user's posts to display in the post tab.
@@ -89,92 +90,115 @@ export default function MyPost() {
   }
 
   const renderItem = ({ item }: { item: Post }) => (<Item post={item}></Item>);
-    
+
+  const onRefresh = async () => {
+    if (user === undefined || user === null || !user.uid) { return; }
+    try {
+      setRefreshing(true);
+      await retrievePostsForCurrentUser(user.uid);
+      setRefreshing(false);
+    }
+    catch (error) {
+      console.log(`Error fetching user posts: ${error}`);
+    }
+  };
+
   return (<View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Tasty Trade</Text>
-          <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
-            <Ionicons name="person-circle-outline" size={40} color="black" />
-          </TouchableOpacity>
-        </View>
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Tasty Trade</Text>
+      <TouchableOpacity onPress={() => router.push('../(profile)/profile')}>
+        <Ionicons name="person-circle-outline" size={40} color="black" />
+      </TouchableOpacity>
+    </View>
 
-        <FlatList
-            data={posts}
-            renderItem={renderItem}
-            keyExtractor={item => item.postId}
-        />
+    {posts.length === 0 && (
+        <Text style={styles.noPostsText}>No Posts</Text>
+      )}
+    <FlatList
+      data={posts}
+      renderItem={renderItem}
+      keyExtractor={item => item.postId}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    />
 
-        <View>
-          <TouchableOpacity onPress={() => router.push('../(posts)/createPost')} style={styles.createButton}>
-            <Feather name="plus-circle" size={30} color="black" />
-          </TouchableOpacity>
-        </View>
+    <View>
+      <TouchableOpacity onPress={() => router.push('../(posts)/createPost')} style={styles.createButton}>
+        <Feather name="plus-circle" size={30} color="black" />
+      </TouchableOpacity>
+    </View>
   </View>);
 };
-  
+
 const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            padding: 20,
-            backgroundColor: '#fff',
-            justifyContent: 'center',
-        },
-        header: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 20,
-        },
-        headerTitle: {
-            fontSize: 24,
-            fontWeight: 'bold',
-        },
-        item: {
-            flexDirection: 'row',
-            padding: 10,
-            borderBottomWidth: 1,
-            borderWidth: 2,
-            borderColor: 'rgba(0, 0, 0, 0.1)',
-            borderRadius: 5,
-            marginBottom: 10,
-            width: '100%',          // Ensures the item takes full width of the container
-            height: 130,   
-        },
-        image: {
-            width: 80,
-            height: 80,
-            borderRadius: 10,
-        },
-        info: {
-            marginLeft: 10,
-            width: '70%',
-            justifyContent: 'center',
-        },
-        title: {
-            fontSize: 18,
-            fontWeight: 'bold',
-        },
-        distance: {
-            fontSize: 14,
-            color: '#555',
-            marginBottom: 10,
-        },
-        button: {
-            backgroundColor: '#4CAF50', 
-            paddingVertical: 10,
-            paddingHorizontal: 20, 
-            borderRadius: 5,
-            alignItems: 'center',
-          },
-        buttonText: {
-            color: 'white', // Customize text color
-            fontSize: 18, // Customize font size
-            fontWeight: 'bold',
-          },
-        createButton: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginTop: 15,
-        },
-      });
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  item: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderWidth: 2,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '100%',          // Ensures the item takes full width of the container
+    height: 130,
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  info: {
+    marginLeft: 10,
+    width: '70%',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  distance: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white', // Customize text color
+    fontSize: 18, // Customize font size
+    fontWeight: 'bold',
+  },
+  createButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+  noPostsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
+  },
+});

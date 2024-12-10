@@ -45,7 +45,8 @@ export default function ChatRoom() {
           {latitude: postGeoPoint.latitude, longitude: postGeoPoint.longitude},
           {latitude: userGeoPoint.latitude, longitude: userGeoPoint.longitude});
 
-      return geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
+      const distanceInMiles = geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
+      return parseFloat(distanceInMiles.toFixed(2));
     } else {
       return -1;
     }
