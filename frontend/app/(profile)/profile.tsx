@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Pressable, View, Text, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, Pressable, View, Text, TouchableOpacity, Button, Alert } from 'react-native';
 import { Post } from "@/app/interfaces";
 
 import { signOut, deleteUser } from "firebase/auth"
@@ -134,6 +134,13 @@ export default function HomeScreen() {
     router.push('/');
   }
 
+  const deleteAlert = () => {
+    Alert.alert('Account Deletion','Are you sure you want to delete your account? Action cannot be undone !', [
+      { text: "Cancel", onPress: () => console.log("Cancel Pressed"), style: "cancel" },
+      { text: "Confirm", onPress: () => handleDelete() }],
+      { cancelable: false });
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -151,7 +158,7 @@ export default function HomeScreen() {
         <Button title="Sign Out" color='#FF0000' onPress={handleSignOut} />
       </View>
       <View style={styles.button}>
-        <Button title="Delete Account" color='#FF0000' onPress={handleDelete} />
+        <Button title="Delete Account" color='#FF0000' onPress={deleteAlert} />
       </View>
     </View>
   );
