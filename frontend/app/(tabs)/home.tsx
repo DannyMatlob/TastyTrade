@@ -7,15 +7,11 @@ import {Post} from "@/app/Post";
 import {useUser} from "@/app/UserContext";
 import * as geolib from 'geolib';
 
-import {collection, doc, GeoPoint, getDoc, getDocs} from "firebase/firestore";
+import {collection, doc, GeoPoint, getDoc, getDocs, setDoc, updateDoc, arrayUnion} from "firebase/firestore";
 import {db} from "@/firebaseConfig";
+import uuid from 'react-native-uuid';
+import { Chat } from '../interfaces';
 
-const handleDetails = (description: string) => {
-  Alert.alert('Food Description', description, [
-    { text: "Cancel", onPress: () => console.log("Cancel Pressed"), style: "cancel" },
-    { text: "Request", onPress: () => console.log("OK Pressed") }],
-    { cancelable: false });
-}
 
 // 'Item' visual element requires a wrapper for Post.
 type ItemProps = {
@@ -37,6 +33,91 @@ export default function MyPost() {
       console.log(`Error fetching user posts: ${error}`);
     }
   }, [user]);
+
+  const handleDetails = (post: Post) => {
+    const description = post.description;
+    Alert.alert('Food Description', description, [
+      { text: "Cancel", onPress: () => console.log("Cancel Pressed"), style: "cancel" },
+      { text: "Request", onPress: () => handleRequest(post.postId, post.title) }],
+      { cancelable: false });
+  }
+  
+  const handleRequest = async (postId: string, title: string) => {
+    if (!user || !user.uid) {
+      console.error("Current user not defined when they should be...");
+      return;
+    }
+  
+    try {
+      // Get the post details to find the creator
+      const postRef = doc(db, "posts", postId);
+      const postSnap = await getDoc(postRef);
+      const post = postSnap.data() as Post;
+      const creatorUid = post.creatorUid;
+  
+      // Check if chat already exists between these users for this post
+      const user1Ref = doc(db, "users", user.uid);
+      const user1Snap = await getDoc(user1Ref);
+      const user1Chats = user1Snap.data()?.chats || [];
+  
+      // Get all existing chats for user
+      const chatPromises = user1Chats.map(async (chatId: string) => {
+        const chatRef = doc(db, "chats", chatId);
+        const chatSnap = await getDoc(chatRef);
+        return chatSnap.data() as Chat;
+      });
+      
+      const existingChats = await Promise.all(chatPromises);
+      
+      // Check if chat already exists for this post
+      const existingChat = existingChats.find(chat => 
+        chat && chat.postId === postId && 
+        ((chat.user1 === user.uid && chat.user2 === creatorUid) ||
+         (chat.user1 === creatorUid && chat.user2 === user.uid))
+      );
+  
+      if (existingChat) {
+        // Navigate to the existing chat using the chatId
+        router.push({
+          pathname: "../(chatroom)/chatroom/[id]",
+          params: { id: existingChat.chatId }
+        });
+        return;
+      }
+  
+      // Create new chat if no existing chat was found
+      const chatId = uuid.v4().toString();
+      const newChat = {
+        chatId: chatId,
+        user1: user.uid,
+        user2: creatorUid,
+        postId: postId,
+        messages: []
+      };
+  
+      // Add chat document to chats collection
+      await setDoc(doc(db, "chats", chatId), newChat);
+  
+      // Add chatId to both users' chats arrays
+      const user2Ref = doc(db, "users", creatorUid);
+      await updateDoc(user1Ref, {
+        chats: arrayUnion(chatId)
+      });
+      await updateDoc(user2Ref, {
+        chats: arrayUnion(chatId)
+      });
+  
+      // Navigate to the newly created chat
+      router.push({
+        pathname: "../(chatroom)/chatroom/[id]",
+        params: { id: chatId }
+      });
+      
+    } catch (error) {
+      console.error('Error creating chat:', error);
+      Alert.alert('Error', 'Failed to create chat. Please try again.');
+    }
+  };
 
   /** Retrieves every post in the posts firebase database. Also filters posts based on certain rules. */
   const retrievePosts = async () => {
@@ -87,7 +168,7 @@ export default function MyPost() {
           <Text style={styles.title}>{post.title}</Text>
           <Text
               style={styles.distance}>{`About ${post.distanceFromUser} miles away.`}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => handleDetails(post.description)}>
+          <TouchableOpacity style={styles.button} onPress={() => handleDetails(post)}>
             <Text style={styles.buttonText}>Details</Text>
           </TouchableOpacity>
         </View>
