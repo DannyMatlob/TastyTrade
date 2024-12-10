@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -26,6 +26,7 @@ export default function ChatRoom() {
   const [newMessage, setNewMessage] = useState<string>('');
   const { user } = useUser();
   const { id } = useLocalSearchParams();
+  const flatListRef = useRef<FlatList>(null);
 
   /** Calculates the distance between a given post's GeoPoint and the current user's GeoPoint.
      * Returns a promise of the number (distance) in miles. */
@@ -45,7 +46,7 @@ export default function ChatRoom() {
           {latitude: postGeoPoint.latitude, longitude: postGeoPoint.longitude},
           {latitude: userGeoPoint.latitude, longitude: userGeoPoint.longitude});
 
-      const distanceInMiles = geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
+            const distanceInMiles = geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
       return parseFloat(distanceInMiles.toFixed(2));
     } else {
       return -1;
@@ -108,7 +109,7 @@ export default function ChatRoom() {
   //Logic to send message to firebase
   const sendMessage = async () => {
     if (!user || !id) {console.error("this shouldn't happen"); return;}
-
+    if (newMessage === "") {console.log("BLANK MESSAGE NOT SENT"); return;}
     const msgObject = {
       msg: newMessage,
       owner: user.uid as string,
@@ -120,6 +121,7 @@ export default function ChatRoom() {
       messages: arrayUnion(msgObject)
     });
     setNewMessage('');
+    flatListRef.current?.scrollToEnd({ animated: true });
   }
 
   //Logic to delete the chat from firebase
@@ -219,6 +221,7 @@ export default function ChatRoom() {
       </View>
       
       <FlatList
+        ref={flatListRef} 
         data={bubbles}
         renderItem={renderMessage}
         keyExtractor={item => item.id.toString()}
@@ -260,6 +263,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'flex-end',
   },
   header: {
     padding: 20,
@@ -282,7 +286,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messageListContent: {
-    padding: 15,
+    paddingTop: 15,
+    paddingHorizontal: 15,
+    paddingBottom: 75,
   },
   messageBubble: {
     maxWidth: '70%',
