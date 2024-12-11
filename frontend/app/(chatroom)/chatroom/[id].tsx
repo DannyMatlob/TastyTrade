@@ -94,11 +94,12 @@ export default function ChatRoom() {
     let curId = 0;
     for (const message of chat.messages) {
       const date = new Date(message.timestamp.seconds * 1000)
+      const time = date.toLocaleTimeString().replace(/:\d{2}(?=\s[APap][Mm])/, '');
         const bubble : ChatBubble = {
           id: curId,
           text: message.msg,
           sender: message.owner == user.uid ? "self" : "other",
-          timestamp: date.toLocaleDateString()
+          timestamp: time
         }
         curId++;
         bubblesData.push(bubble);
@@ -170,6 +171,9 @@ export default function ChatRoom() {
       ]}>
         {item.text}
       </Text>
+      <Text style={styles.timestamp}>
+      {item.timestamp}
+    </Text>
     </View>
   );
 
@@ -369,6 +373,11 @@ const styles = StyleSheet.create({
   foodDistance: {
     fontSize: 14,
     color: '#666',
+  },
+  timestamp: {
+    fontSize: 12,
+    color: 'rgb(112, 105, 84)',
+    marginLeft: 3, 
   },
 });
 
