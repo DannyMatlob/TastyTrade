@@ -177,7 +177,6 @@ export default function MyPost() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
   );
 
   /** Calculates the distance between a given post's GeoPoint and the current user's GeoPoint.
