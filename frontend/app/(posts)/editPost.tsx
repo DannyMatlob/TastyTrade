@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Image, View, Text, TextInput, Button, Alert, TouchableOpacity} from 'react-native';
+import { Image, View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
 import React, { useState, useEffect } from 'react';
@@ -54,7 +54,7 @@ export default function editPost() {
       console.error(`Post retrieval error: ${error}`);
     }
   };
-  
+
   const handleShare = async () => {
     if (!imageUri || !title || !description) {
       Alert.alert('Error', 'Please complete all fields.');
@@ -105,7 +105,7 @@ export default function editPost() {
       console.error("Error uploading image to firebase database: ", error);
     }
   }
-    
+
   useEffect(() => {
     // Automatically call the function when the component mounts.
     retrieveAndSetInfo(postId);
@@ -131,6 +131,32 @@ export default function editPost() {
     const imageRef = ref(storage, `images/${postId}`);
 
     try {
+      var userDocSnap = await getDoc(userRef);
+      // Create a new user if they do not exist.
+      if (!userDocSnap.exists()) {
+        return
+      }
+      const chatIds = userDocSnap.data().chats;
+      const chatPromises = chatIds.map(async (chatId: string) => {
+        const chatDocRef = doc(db, "chats", chatId);
+        const chatDocSnap = await getDoc(chatDocRef);
+        if (chatDocSnap.exists()) {
+          const chatPostId = chatDocSnap.data().postId;
+          if (chatPostId === postId) {
+            const user1id = chatDocSnap.data().user1;
+            const user2id = chatDocSnap.data().user2;
+            var user2DocRef = doc(db, "users", user2id);
+            await updateDoc(user2DocRef, {
+              chats: arrayRemove(chatId)  // Removes the specified chat ID from the array
+            });
+            var user1DocRef = doc(db, "users", user1id);
+            await updateDoc(user1DocRef, {
+              chats: arrayRemove(chatId)  // Removes the specified chat ID from the array
+            });
+          }
+          await deleteDoc(chatDocRef);
+        }
+      });
       // Delete the post from the 'posts' collection.
       await deleteDoc(docRef);
 
@@ -147,7 +173,7 @@ export default function editPost() {
 
     router.push('../(tabs)/post');
   }
-  
+
   return (
     <View style={postStyles.container}>
       <View style={postStyles.header}>
@@ -156,16 +182,16 @@ export default function editPost() {
           <Ionicons name="person-circle-outline" size={40} color="black" />
         </TouchableOpacity>
       </View>
-  
+
       <Text style={postStyles.subTitle}>Edit Post</Text>
-  
+
       {imageUri ?
         (<Image source={{ uri: imageUri }} style={postStyles.image} />) :
         (<View style={postStyles.imagePlaceholder}>
           <Text>No image selected</Text>
         </View>)
       }
-  
+
       <TouchableOpacity onPress={async () => {
         const imageURI = await pickImage();
         if (imageURI != null) { setImageUri(imageURI); }
@@ -173,14 +199,14 @@ export default function editPost() {
         <Text style={postStyles.imageButtonText}>Select Image</Text>
         <Ionicons name="create-outline" size={20} color="black" />
       </TouchableOpacity>
-  
+
       <TextInput
         style={postStyles.input}
         placeholder="Write a title..."
         value={title}
         onChangeText={setTitle}
       />
-  
+
       <TextInput
         style={postStyles.input}
         placeholder="Write a description..."
@@ -189,8 +215,8 @@ export default function editPost() {
       />
 
       <View style={{ gap: 10 }}>
-        <Button title="Finish" color='#4CAF50' onPress={handleShare}/>
-        <Button title="Cancel" color='#FFA500' onPress={() => router.push('../(tabs)/post')}/>
+        <Button title="Finish" color='#4CAF50' onPress={handleShare} />
+        <Button title="Cancel" color='#FFA500' onPress={() => router.push('../(tabs)/post')} />
       </View>
 
       <View style={{ marginTop: 40 }}>
