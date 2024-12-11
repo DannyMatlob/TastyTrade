@@ -40,6 +40,7 @@ const ChatItem = ({ preview } : {preview: Preview}) => {
 
 export default function MyChats() {
   const [previews, setPreviews] = useState<Preview[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useUser();
   
   //Business Logic
@@ -145,6 +146,18 @@ export default function MyChats() {
     />
   );
 
+  const onRefresh = async () => {
+    if (user === undefined || user === null || !user.uid) { return; }
+    try {
+      setRefreshing(true);
+      await retrieveListOfChats(user.uid);
+      setRefreshing(false);
+    }
+    catch (error) {
+      console.log(`Error fetching user posts: ${error}`);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -153,11 +166,16 @@ export default function MyChats() {
           <Ionicons name="person-circle-outline" size={40} color="black" />
         </TouchableOpacity>
       </View>
+      {previews.length === 0 && (
+        <Text style={styles.noChatsText}>No Chats</Text>
+      )}
       <FlatList
         data={previews}
         renderItem={renderItem}
         keyExtractor={item => item.chatId}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     </View>
   );
@@ -226,5 +244,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  noChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
   },
 });

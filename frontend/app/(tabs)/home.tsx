@@ -1,14 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import React, {useEffect, useState} from 'react';
-import {router} from 'expo-router';
-import {Post} from "@/app/Post";
-import {useUser} from "@/app/UserContext";
+import React, { useEffect, useState } from 'react';
+import { router } from 'expo-router';
+import { Post } from "@/app/Post";
+import { useUser } from "@/app/UserContext";
 import * as geolib from 'geolib';
 
-import {collection, doc, GeoPoint, getDoc, getDocs, setDoc, updateDoc, arrayUnion} from "firebase/firestore";
-import {db} from "@/firebaseConfig";
+
+import {collection, doc, GeoPoint, getDoc, getDocs, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { db } from "@/firebaseConfig";
 import uuid from 'react-native-uuid';
 import { Chat } from '../interfaces';
 
@@ -20,18 +21,21 @@ type ItemProps = {
 
 export default function MyPost() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useUser();
 
   // Sets posts that should be displayed to the current user.
   useEffect(() => {
     // Wait for the current user's information to be loaded.
     if (user === undefined || user === null) { return; }
-
-    try {
-      retrievePosts();
-    } catch (error) {
-      console.log(`Error fetching user posts: ${error}`);
-    }
+    const unsub = onSnapshot(doc(db, "users", user.uid as string), (doc) => {
+      const source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+      try {
+        retrievePosts();
+      } catch (error) {
+        console.log(`Error fetching user posts: ${error}`);
+      }
+    });
   }, [user]);
 
   const handleDetails = (post: Post) => {
@@ -161,18 +165,18 @@ export default function MyPost() {
     });
   };
 
-  const Item = ({post}: ItemProps) => (
+  const Item = ({ post }: ItemProps) => (
       <View style={styles.item}>
         <Image source={{uri: post.imageUrl}} style={styles.image}/>
         <View style={styles.info}>
           <Text style={styles.title}>{post.title}</Text>
-          <Text
-              style={styles.distance}>{`About ${post.distanceFromUser} miles away.`}</Text>
+          <Text style={styles.distance}>{`About ${post.distanceFromUser} miles away.`}</Text>
           <TouchableOpacity style={styles.button} onPress={() => handleDetails(post)}>
             <Text style={styles.buttonText}>Details</Text>
           </TouchableOpacity>
         </View>
       </View>
+    </View>
   );
 
   /** Calculates the distance between a given post's GeoPoint and the current user's GeoPoint.
@@ -190,17 +194,24 @@ export default function MyPost() {
 
       // Even though a GeoPoint is just {latitude, longitude}, geolib won't accept the GeoPoint raw, hence we unwrap.
       const distanceBetweenPostAndUser = geolib.getDistance(
-          {latitude: postGeoPoint.latitude, longitude: postGeoPoint.longitude},
-          {latitude: userGeoPoint.latitude, longitude: userGeoPoint.longitude});
+        { latitude: postGeoPoint.latitude, longitude: postGeoPoint.longitude },
+        { latitude: userGeoPoint.latitude, longitude: userGeoPoint.longitude });
 
-      return geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
+      const distanceInMiles = geolib.convertDistance(distanceBetweenPostAndUser, 'mi');
+      return parseFloat(distanceInMiles.toFixed(2));
     } else {
       return -1;
     }
   }
 
   const renderItem = ({ item }: { item: Post }) => (<Item post={item}></Item>);
-    
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await retrievePosts();
+    setRefreshing(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -209,73 +220,83 @@ export default function MyPost() {
           <Ionicons name="person-circle-outline" size={40} color="black" />
         </TouchableOpacity>
       </View>
-
+      {posts.length === 0 && (
+        <Text style={styles.noPostsText}>No Posts</Text>
+      )}
       <FlatList
         data={posts}
         renderItem={renderItem}
         keyExtractor={item => item.postId}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     </View>
   );
 };
-  
+
 const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            padding: 20,
-            backgroundColor: '#fff',
-            justifyContent: 'center',
-        },
-        header: {
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 20,
-        },
-        headerTitle: {
-            fontSize: 24,
-            fontWeight: 'bold',
-        },
-        item: {
-            flexDirection: 'row',
-            padding: 10,
-            borderBottomWidth: 1,
-            borderWidth: 2,
-            borderColor: 'rgba(0, 0, 0, 0.1)',
-            borderRadius: 5,
-            marginBottom: 10,
-            width: '100%',          // Ensures the item takes full width of the container
-            height: 130,   
-        },
-        image: {
-            width: 80,
-            height: 80,
-            borderRadius: 10,
-        },
-        info: {
-            marginLeft: 10,
-            width: '70%',
-            justifyContent: 'center',
-        },
-        title: {
-            fontSize: 18,
-            fontWeight: 'bold',
-        },
-        distance: {
-            fontSize: 14,
-            color: '#555',
-            marginBottom: 10,
-        },
-        button: {
-            backgroundColor: '#4CAF50', // Customize background color
-            paddingVertical: 10, // Control height of the button
-            paddingHorizontal: 20, // Control width of the button
-            borderRadius: 5, // Round the corners
-            alignItems: 'center',
-          },
-        buttonText: {
-            color: 'white', // Customize text color
-            fontSize: 18, // Customize font size
-            fontWeight: 'bold',
-          },
-      });
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  item: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderWidth: 2,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '100%',          // Ensures the item takes full width of the container
+    height: 130,
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  info: {
+    marginLeft: 10,
+    width: '70%',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  distance: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#4CAF50', // Customize background color
+    paddingVertical: 10, // Control height of the button
+    paddingHorizontal: 20, // Control width of the button
+    borderRadius: 5, // Round the corners
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white', // Customize text color
+    fontSize: 18, // Customize font size
+    fontWeight: 'bold',
+  },
+  noPostsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
+  },
+});

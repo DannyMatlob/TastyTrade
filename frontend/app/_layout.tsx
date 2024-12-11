@@ -35,6 +35,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
           <Stack.Screen name="(chatroom)" options={{ headerShown: false }} />
+          <Stack.Screen name="(posts)" options={{ headerShown: false }} />
+          {/* <Stack.Screen name="(profile)" options={{ headerShown: false }} /> */}
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>
