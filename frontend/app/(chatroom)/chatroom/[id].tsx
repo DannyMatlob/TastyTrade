@@ -217,7 +217,7 @@ export default function ChatRoom() {
         <Image source={{ uri: foodPost?.image}} style={styles.foodImage} />
         <View style={styles.foodInfo}>
           <Text style={styles.foodTitle}>{foodPost?.title}</Text>
-          <Text style={styles.foodDistance}>{foodPost?.distance}</Text>
+          <Text style={styles.foodDistance}>{"About " + foodPost?.distance + " miles from you"}</Text>
         </View>
       </View>
       
