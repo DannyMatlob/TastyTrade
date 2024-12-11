@@ -36,6 +36,7 @@ export default function MyPost() {
         console.log(`Error fetching user posts: ${error}`);
       }
     });
+    return () => unsub();
   }, [user]);
 
   const handleDetails = (post: Post) => {
